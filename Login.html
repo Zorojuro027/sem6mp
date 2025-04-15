@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="Login.css">
+    <link rel="stylesheet" href="Home.html">
+</head>
+<body>
+    
+    <div>
+        <div class="container">
+            <div class="form-container">
+                <div id="box"><h2>Welcome To FitSync</h2></div>
+                
+                <form action="login.php" method="POST">
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" name="email" placeholder="Eg: fake1@gmail.com" required>
+
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+
+                    <button type="submit" class="login-btn">Log In</button>
+
+
+                    <p style="margin-top: 20px;">
+                        Don't have an account? <a href="signup.html" style="color: white;">Sign Up</a>
+                    </p>
+                </form>
+            </div>
+
+            <div class="image-container">
+                <img src="Loginpg photo.jpg" alt="Gym Image">
+            </div>
+        </div>
+
+    </div>
+    <script>
+    // Included your existing cookie/dark mode script here
+    (function() {
+      // Function to set a cookie
+      function setCookie(name, value, days) {
+          let expires = "";
+          if (days) {
+              let date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              expires = "; expires=" + date.toUTCString();
+          }
+          document.cookie = name + "=" + value + expires + "; path=/";
+      }
+
+      // Function to get a cookie value
+      function getCookie(name) {
+          let nameEQ = name + "=";
+          let cookiesArray = document.cookie.split(';');
+          for (let i = 0; i < cookiesArray.length; i++) {
+              let c = cookiesArray[i].trim();
+              if (c.indexOf(nameEQ) === 0) {
+                  return c.substring(nameEQ.length, c.length);
+              }
+          }
+          return null;
+      }
+
+      // Function to apply dark mode based on cookie
+      function applyDarkMode() {
+          let darkModeEnabled = getCookie("darkMode");
+          if (darkModeEnabled === "true") {
+              document.body.classList.add("dark-mode"); // Assuming you have dark-mode styles in Login.css
+              var toggle = document.getElementById("dark-mode-toggle"); // If you add a toggle here
+              if (toggle) toggle.checked = true;
+          }
+      }
+
+      // Apply dark mode on page load (if applicable styles exist)
+      window.addEventListener("load", function() {
+          applyDarkMode();
+      });
+    })();
+  </script>
+</body>
+</html>

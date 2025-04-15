@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitSync Community Forum</title>
+  <link rel="stylesheet" href="../sidebar/sidebar.css" />
+  <script src="../scripts/darkmode.js" defer></script>
+  <style>
+    /* Base Layout */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .layout-table {
+      width: 100%;
+      height: 100vh;
+      border-collapse: collapse;
+    }
+    .sidebar-cell {
+      width: 20%;
+      vertical-align: top;
+      background-color: #39d75b;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main-cell {
+      width: 80%;
+      vertical-align: top;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-y: auto;
+    }
+    
+    /* Dark Mode Toggle Button (floating at top-right) */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+    
+    /* Dark Mode Colors (Spotify-inspired) */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ccc;
+    }
+    /* Sidebar in dark mode: Darker Spotify green */
+    body.dark-mode .sidebar-cell {
+      background-color: #1AA447;
+      color: #ccc;
+      border-right: 1px solid #333;
+    }
+    body.dark-mode .main-cell {
+      background-color: #191414;
+      color: #ccc;
+    }
+    /* Pill buttons: same border in light and dark modes */
+    .pill-button {
+      background-color: #39d75b;
+      border: 2px solid #000;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 20px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    body.dark-mode .pill-button {
+      background-color: #1DB954;
+      color: #fff;
+      border: 2px solid #000;
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 20px 0;
+      position: relative;
+    }
+    .sidebar-cell ul li a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+    }
+    
+    /* Accordion Dropdown for Sidebar */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-left: 20px;
+    }
+    .dropdown:hover .dropdown-menu {
+      max-height: 300px;
+    }
+    .dropdown-menu li {
+      margin: 10px 0;
+    }
+    
+    /* Forum Container (Main Content) */
+    .forum-container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    
+    /* New Post Form (Hidden by default) */
+    .new-post-form {
+      display: none;
+      margin-bottom: 40px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #fafafa;
+    }
+    .new-post-form input[type="text"],
+    .new-post-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .new-post-form input[type="file"] {
+      margin: 8px 0;
+    }
+    .new-post-form button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .new-post-form button:hover {
+      background: #45a049;
+    }
+    
+    /* Posts Container (Chats) */
+    #posts-container {
+      display: block;
+    }
+    .post-card {
+      border-bottom: 1px solid #ddd;
+      padding: 15px 0;
+    }
+    .post-card:last-child {
+      border-bottom: none;
+    }
+    .post-card h3 {
+      margin: 5px 0;
+    }
+    .post-meta {
+      font-size: 12px;
+      color: #777;
+    }
+    .post-content {
+      margin: 10px 0;
+    }
+    .post-content img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .post-actions a {
+      margin-right: 10px;
+      font-size: 14px;
+      color: blue;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    /* Dark Mode for Forum */
+    body.dark-mode .forum-container {
+      background: #1e1e1e;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    body.dark-mode .new-post-form {
+      background: #2a2a2a;
+      border-color: #444;
+    }
+    body.dark-mode input[type="text"],
+    body.dark-mode textarea {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s;
+    }
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark Mode Toggle -->
+  <input type="checkbox" id="dark-mode-toggle">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙 Dark Mode</label>
+  
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+  
+  <table class="layout-table">
+    <tr>
+      <td class="sidebar-cell">
+      <h2>FitSync</h2>
+      <ul>
+        <li><button class="pill-button"><a href="../Home.html">📊 Dashboard</a></button></li>
+        <li class="dropdown">
+          <button class="pill-button">📅 Schedule ▼</button>
+          <ul class="dropdown-menu">
+            <li><button class="pill-button"><a href="../workout.html">Workout Plan</a></button></li>
+            <li><button class="pill-button"><a href="../Diet/diet.html" target="_blank">Meal Plan</a></button></li>
+            <li><button class="pill-button"><a href="../schedule.html" target="_blank">Calendar</a></button></li>
+          </ul>
+        </li>
+        <li><button class="pill-button"><a href="../Community/comm.html">💬 Community</a></button></li>
+        <li class="dropdown">
+          <button class="pill-button">⚙️ Settings ▼</button>
+          <ul class="dropdown-menu">
+            <li><button class="pill-button"><a href="../Settings/profile.php">Profile</a></button></li>
+            <li><button class="pill-button"><a href="../Settings/privacy.html">Privacy</a></button></li>
+          </ul>
+        </li>
+        <li><button class="pill-button"><a href="../logout.php">🔒 Logout</a></button></li>
+      </ul>
+      <button class="pill-button create-post-btn">✏️ Create Post</button>
+      </td>
+      
+      <!-- Main Content -->
+      <td class="main-cell">
+        <div class="forum-container">
+          <h1>FitSync Community Forum</h1>
+          <!-- New Post Form (hidden by default) -->
+          <div class="new-post-form">
+            <h2 id="form-title">Create a New Post</h2>
+            <form id="post-form">
+              <input type="hidden" id="post-id">
+              <input type="text" id="author" placeholder="Your Name (Optional)">
+              <input type="text" id="title" placeholder="Post Title" required>
+              <!-- New File Input for Image -->
+              <input type="file" id="image" accept="image/*">
+              <textarea id="content" rows="5" placeholder="Share your thoughts..." required></textarea>
+              <button type="submit" id="submit-btn">Submit Post</button>
+            </form>
+          </div>
+          <!-- Chats / Posts Container -->
+          <div id="posts-container"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <footer>
+    <div style="text-align: center; padding: 10px; background-color: #39d75b; color: white;">
+      <p>&copy; 2023 FitSync. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    // Utility Functions for localStorage
+    const storageKey = 'posts';
+    
+    function loadPosts() {
+      const posts = localStorage.getItem(storageKey);
+      return posts ? JSON.parse(posts) : [];
+    }
+    
+    function savePosts(posts) {
+      localStorage.setItem(storageKey, JSON.stringify(posts));
+    }
+    
+    // Render posts (Chats)
+    function renderPosts() {
+      const container = document.getElementById('posts-container');
+      const posts = loadPosts();
+      let html = '';
+    
+      if (posts.length === 0) {
+        html = '<p>No posts yet. Be the first to share with the community!</p>';
+      } else {
+        // Reverse posts so newest appear on top
+        posts.slice().reverse().forEach(post => {
+          html += `
+            <div class="post-card">
+              <h3>${escapeHtml(post.title)}</h3>
+              <div class="post-meta">By ${escapeHtml(post.author || 'Anonymous')} on ${post.date}</div>
+              <div class="post-content">
+                ${nl2br(escapeHtml(post.content))}
+                ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
+              </div>
+              <div class="post-actions">
+                <a onclick="editPost('${post.id}')">Edit</a>
+                <a onclick="deletePost('${post.id}')">Delete</a>
+              </div>
+            </div>
+          `;
+        });
+      }
+      container.innerHTML = html;
+    }
+    
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    function nl2br(text) {
+      return text.replace(/\n/g, '<br>');
+    }
+    
+    // Handle form submission with image support
+    document.getElementById('post-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const posts = loadPosts();
+      const idField = document.getElementById('post-id');
+      const author = document.getElementById('author').value.trim() || 'Anonymous';
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const imageInput = document.getElementById('image');
+    
+      if (!title || !content) {
+        alert('Post title and content are required!');
+        return;
+      }
+    
+      // Function to save post (common for new or edit)
+      function savePost(imageData) {
+        if (idField.value) {
+          // Edit existing post
+          const index = posts.findIndex(p => p.id === idField.value);
+          if (index > -1) {
+            posts[index].author = author;
+            posts[index].title = title;
+            posts[index].content = content;
+            posts[index].date = new Date().toLocaleString();
+            posts[index].image = imageData || '';
+          }
+        } else {
+          // Create new post
+          const newPost = {
+            id: Date.now() + '_' + Math.floor(Math.random() * 900 + 100),
+            author: author,
+            title: title,
+            content: content,
+            date: new Date().toLocaleString(),
+            image: imageData || ''
+          };
+          posts.push(newPost);
+        }
+        savePosts(posts);
+        resetForm();
+        renderPosts();
+      }
+    
+      // If an image is selected, read it as Base64; otherwise, save immediately
+      if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const imageData = event.target.result;
+          savePost(imageData);
+        }
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        savePost('');
+      }
+    });
+    
+    // Set form fields for editing a post
+    function editPost(id) {
+      const posts = loadPosts();
+      const post = posts.find(p => p.id === id);
+      if (post) {
+        document.getElementById('post-id').value = post.id;
+        document.getElementById('author').value = post.author;
+        document.getElementById('title').value = post.title;
+        document.getElementById('content').value = post.content;
+        document.getElementById('form-title').innerText = 'Edit Post';
+        document.getElementById('submit-btn').innerText = 'Update Post';
+        window.scrollTo(0, 0);
+      }
+    }
+    
+    // Delete a post
+    function deletePost(id) {
+      if (confirm('Are you sure you want to delete this post?')) {
+        let posts = loadPosts();
+        posts = posts.filter(p => p.id !== id);
+        savePosts(posts);
+        renderPosts();
+      }
+    }
+    
+    // Reset form to default (new post)
+    function resetForm() {
+      document.getElementById('post-id').value = '';
+      document.getElementById('author').value = '';
+      document.getElementById('title').value = '';
+      document.getElementById('content').value = '';
+      document.getElementById('image').value = '';
+      document.getElementById('form-title').innerText = 'Create a New Post';
+      document.getElementById('submit-btn').innerText = 'Submit Post';
+    }
+    
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.checked = true;
+    }
+    document.querySelector('.dark-mode-btn').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+    });
+    
+    // Toggle New Post Form Visibility (Create Post Button)
+    const createPostBtn = document.querySelector('.create-post-btn');
+    createPostBtn.addEventListener('click', () => {
+      const newPostForm = document.querySelector('.new-post-form');
+      const postsContainer = document.getElementById('posts-container');
+      if (newPostForm.style.display === 'none' || newPostForm.style.display === '') {
+        newPostForm.style.display = 'block';
+        postsContainer.style.display = 'none';
+        createPostBtn.textContent = '← Back to Chats';
+      } else {
+        newPostForm.style.display = 'none';
+        postsContainer.style.display = 'block';
+        createPostBtn.textContent = '✏️ Create Post';
+      }
+    });
+    
+    // Initialize posts on page load
+    renderPosts();
+  </script>
+
+<script>
+  (function() {
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+    
+    // Function to get a cookie value
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let cookiesArray = document.cookie.split(';');
+        for (let i = 0; i < cookiesArray.length; i++) {
+            let c = cookiesArray[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    }
+    
+    // Function to apply dark mode based on cookie
+    function applyDarkMode() {
+        let darkModeEnabled = getCookie("darkMode");
+        if (darkModeEnabled === "true") {
+            document.body.classList.add("dark-mode");
+            var toggle = document.getElementById("dark-mode-toggle");
+            if (toggle) toggle.checked = true;
+        }
+    }
+    
+    // Function to apply meal preference (if element exists)
+    function applyMealPreference() {
+        let mealPref = getCookie("mealPref");
+        let mealPreferenceSelect = document.getElementById("mealPreference");
+        if (mealPref && mealPreferenceSelect) {
+            mealPreferenceSelect.value = mealPref;
+        }
+    }
+    
+    // Set up dark mode toggle event
+    var darkModeToggle = document.getElementById("dark-mode-toggle");
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("change", function() {
+            if (this.checked) {
+                document.body.classList.add("dark-mode");
+                setCookie("darkMode", "true", 30);
+            } else {
+                document.body.classList.remove("dark-mode");
+                setCookie("darkMode", "false", 30);
+            }
+        });
+    }
+    
+    // Set up meal preference change event (if element exists)
+    var mealPreferenceSelect = document.getElementById("mealPreference");
+    if (mealPreferenceSelect) {
+        mealPreferenceSelect.addEventListener("change", function() {
+            setCookie("mealPref", this.value, 30);
+        });
+    }
+    
+    // Apply preferences on page load
+    window.addEventListener("load", function() {
+        applyDarkMode();
+        applyMealPreference();
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>FitSync Dashboard</title>
+  <style>
+    /* Base Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .layout-table {
+      width: 100%;
+      min-height: 100vh;
+      border-collapse: collapse;
+    }
+    .sidebar-cell {
+      width: 20%; /* Adjust width as needed */
+      min-width: 180px; /* Minimum width for sidebar */
+      vertical-align: top;
+      background-color: #39d75b;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main-cell {
+      width: 80%; /* Adjust width as needed */
+      vertical-align: top;
+      padding: 25px; /* Increased padding */
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Dark Mode Toggle Button (floating at top-right) */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+      font-size: 14px; /* Slightly smaller */
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+    /* Dark Mode Colors (Spotify-inspired) */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ccc;
+    }
+    body.dark-mode .sidebar-cell {
+      background-color: #1AA447;
+      color: #ccc;
+      border-right: 1px solid #333;
+    }
+    body.dark-mode .main-cell {
+      background-color: #191414;
+      color: #ccc;
+    }
+    body.dark-mode .pill-button {
+      background-color: #1DB954;
+      color: #000000;
+      border: 2px solid #004c0a;
+    }
+     body.dark-mode .pill-button a {
+        color: #000000;
+     }
+    body.dark-mode a {
+      color: #1DB954; /* Use theme green for links */
+    }
+     body.dark-mode a:hover {
+         color: #ffffff;
+     }
+
+    /* Sidebar Styling */
+    .sidebar-cell h2 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      color: #000;
+      transition: color 0.3s;
+      text-align: center; /* Center title */
+    }
+    body.dark-mode .sidebar-cell h2 {
+      color: #000000;
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 15px 0;
+      position: relative;
+    }
+    /*.sidebar-cell ul li .pill-button {
+         Width is handled by the pill-button base style 
+    }
+     */    
+    .pill-button {
+      background-color: #39d75b;
+      border: 2px solid #000;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 15px; /* Adjusted padding */
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 15px; /* Adjusted font size */
+      display: flex;
+      align-items: center;
+      gap: 8px; /* Slightly increased gap */
+      box-sizing: border-box;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.15); /* Slightly darker hover */
+    }
+    .sidebar-cell ul li a {
+      color: #000;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+      font-weight: 500; /* Slightly bolder */
+    }
+    /* Auth buttons */
+    #authorize_button, #signout_button {
+        margin-top: 20px;
+        width: 100%; /* Full width */
+        text-align: center;
+        justify-content: center;
+        color: #fff;
+        background-color: #4285F4;
+        border: none;
+        padding: 12px 15px;
+        border-radius: 25px; /* Match pill shape */
+        font-size: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #authorize_button:hover { background-color: #5a95f5; }
+     body.dark-mode #authorize_button, body.dark-mode #signout_button {
+         background-color: #5a95f5;
+         color: #fff;
+         border: none;
+     }
+     body.dark-mode #authorize_button:hover { background-color: #73a5f7; }
+     #signout_button {
+         background-color: #db4437;
+     }
+     #signout_button:hover { background-color: #e06055; }
+     body.dark-mode #signout_button {
+         background-color: #e06055;
+     }
+     body.dark-mode #signout_button:hover { background-color: #e87d74; }
+
+    /* Accordion Dropdown */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out; /* Smoother transition */
+      margin-left: 20px;
+      padding-left: 0;
+      list-style: none;
+    }
+    .dropdown:hover .dropdown-menu {
+      max-height: 300px;
+    }
+    .dropdown-menu li {
+      margin: 8px 0; /* Adjusted spacing */
+    }
+    .dropdown-menu .pill-button {
+       font-size: 14px;
+       padding: 8px 15px;
+       /* width handled by base style */
+    }
+
+    /* Header & General Styles */
+     hr { /* Style separators */
+         border: none;
+         border-top: 1px solid #eee;
+         margin: 30px 0; /* Increased spacing */
+     }
+     body.dark-mode hr {
+         border-top-color: #333;
+     }
+    header h1 {
+      color: #39d75b;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      transition: color 0.3s;
+    }
+     body.dark-mode header h1 {
+         color: #1DB954;
+     }
+    h2, h3, h4 { /* Consistent heading margins */
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+     section { /* Add padding below sections */
+         margin-bottom: 30px;
+     }
+
+    /* Stats Cards */
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin-bottom: 30px;
+      gap: 15px; /* Increased gap */
+    }
+    .stats .card {
+      background: #e8f5e9;
+      border: 1px solid #dcedde; /* Softer border */
+      border-radius: 10px;
+      padding: 20px; /* Increased padding */
+      text-align: center;
+      min-width: 130px; /* Adjusted min-width */
+      flex-basis: 160px;
+      flex-grow: 1;
+      transition: all 0.3s ease; /* Transition all properties */
+      color: #333;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow */
+    }
+     .stats .card:hover {
+         transform: translateY(-3px); /* Lift on hover */
+         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+     }
+    .stats .card strong {
+      display: block;
+      margin-top: 8px; /* Increased space */
+      font-size: 1.4em; /* Larger number */
+      color: #1b5e20; /* Darker green number */
+    }
+    body.dark-mode .stats .card {
+      background-color: #1f2a24;
+      color: #ccc;
+      border-color: #1DB954;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+     body.dark-mode .stats .card:hover {
+         box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+     }
+     body.dark-mode .stats .card strong {
+         color: #66bb6a; /* Lighter green number */
+     }
+
+    /* Forms */
+    form {
+      margin-bottom: 20px;
+      background-color: #f8f9fa; /* Very light grey */
+      padding: 20px; /* Increased padding */
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      border: 1px solid #eee; /* Soft border */
+    }
+     body.dark-mode form {
+         background-color: #2c2c2c; /* Slightly lighter dark */
+         border-color: #3a3a3a;
+     }
+    form label {
+      margin-right: 5px;
+      margin-bottom: 5px;
+      display: inline-block;
+      font-weight: 500; /* Slightly bolder labels */
+      font-size: 14px;
+    }
+    form input[type="number"], form input[type="text"] {
+      padding: 8px 10px; /* Adjusted padding */
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+     form input[type="number"]:focus, form input[type="text"]:focus {
+         border-color: #39d75b; /* Highlight on focus */
+         box-shadow: 0 0 0 2px rgba(57, 215, 91, 0.2);
+         outline: none;
+     }
+     body.dark-mode form input[type="number"], body.dark-mode form input[type="text"] {
+         background-color: #3f3f3f;
+         color: #eee;
+         border-color: #555;
+     }
+     body.dark-mode form input[type="number"]:focus, body.dark-mode form input[type="text"]:focus {
+         border-color: #1DB954;
+         box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3);
+     }
+
+     form button[type="button"] {
+         padding: 9px 18px; /* Adjusted padding */
+         border-radius: 20px; /* Pill shape */
+         border: none;
+         background-color: #39d75b;
+         color: #000;
+         cursor: pointer;
+         transition: background-color 0.3s, transform 0.1s ease;
+         font-weight: 500;
+     }
+     form button[type="button"]:hover {
+         background-color: #2ca54a;
+     }
+     form button[type="button"]:active {
+         transform: scale(0.98); /* Click effect */
+     }
+     body.dark-mode form button[type="button"] {
+         background-color: #1DB954;
+         color: #000;
+     }
+     body.dark-mode form button[type="button"]:hover {
+         background-color: #188941;
+     }
+
+    /* Progress Section */
+    .progress h2 {
+      color: #39d75b;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+     body.dark-mode .progress h2 {
+         color: #1DB954;
+     }
+    #progressDisplay {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    #progressDisplay li {
+      font-size: 17px; /* Adjusted size */
+      padding: 10px 0; /* Adjusted padding */
+      color: #333;
+      transition: color 0.3s;
+      border-bottom: 1px dashed #e0e0e0; /* Softer separator */
+    }
+     #progressDisplay li:last-child {
+         border-bottom: none;
+     }
+    body.dark-mode #progressDisplay li {
+      color: #ddd;
+      border-bottom-color: #444;
+    }
+
+    /* BMI & BRI Containers */
+    .bmi-section, .bri-section { margin-top: 30px; }
+    .bmi-container, .bri-container {
+      background-color: #f8f9fa; /* Match form background */
+      border: 1px solid #eee; /* Match form border */
+      border-radius: 10px;
+      padding: 25px; /* Increased padding */
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+     .bmi-container h2, .bri-container h2 {
+         margin-top: 0;
+         color: #2e7d32;
+         transition: color 0.3s;
+     }
+     body.dark-mode .bmi-container h2, body.dark-mode .bri-container h2 {
+         color: #66bb6a;
+     }
+    /* ... (Keep bar, bar-label, result styles from previous version) ... */
+     .bar-container { /* Unchanged */
+         width: 100%; background: #e0e0e0; border-radius: 5px; margin-top: 15px; overflow: hidden; height: 20px; }
+     body.dark-mode .bar-container { background-color: #444; }
+     .bar { /* Unchanged */
+         height: 100%; width: 0; background: green; transition: width 0.5s ease-out, background-color 0.3s; text-align: center; color: white; font-weight: bold; line-height: 20px; }
+     .bar-label { /* Unchanged */
+         margin-top: 8px; font-size: 14px; text-align: center; font-weight: bold; transition: color 0.3s; }
+     .result { /* Unchanged */
+         margin-top: 15px; font-weight: bold; min-height: 1.2em; /* Prevent layout shift */ }
+     body.dark-mode .bmi-container, body.dark-mode .bri-container {
+         background-color: #2c2c2c; /* Match form background */
+         color: #eee;
+         border-color: #3a3a3a; /* Match form border */
+     }
+     /* BMI Bar Colors */
+     .bmi-underweight { background-color: #3498db; } .bmi-normal { background-color: #2ecc71; } .bmi-overweight { background-color: #f1c40f; } .bmi-obesity { background-color: #e74c3c; }
+     /* BRI Result Styling */
+     .bri-result-text { font-size: 1.1em; margin-top: 10px; }
+     .bri-healthy { color: #2ecc71; } .bri-overweight { color: #f1c40f; } .bri-highrisk { color: #e74c3c; }
+     body.dark-mode .bri-healthy { color: #4caf50; } body.dark-mode .bri-overweight { color: #ffeb3b; } body.dark-mode .bri-highrisk { color: #f44336; }
+
+
+    /* --- Meditation Widget Styles --- */
+    .meditation-section {
+         display: flex;
+         flex-direction: column; /* Stack settings above widget */
+         align-items: center; /* Center items */
+         padding: 30px 0;
+         margin-top: 30px;
+     }
+     /* Style for settings container */
+     .meditation-settings {
+         text-align: center;
+         margin-bottom: 20px; /* Increased space */
+         background-color: #f8f9fa; /* Match forms */
+         padding: 15px 20px; /* Adjusted padding */
+         border-radius: 8px;
+         display: inline-block;
+         transition: background-color 0.3s;
+         border: 1px solid #eee; /* Match forms */
+     }
+      body.dark-mode .meditation-settings {
+          background-color: #2c2c2c; /* Match forms */
+          border-color: #3a3a3a;
+      }
+     .meditation-settings label {
+         margin: 0 5px 0 10px;
+         font-size: 14px;
+         font-weight: 500;
+     }
+     .meditation-settings input[type="number"] {
+         width: 55px; /* Slightly wider */
+         padding: 6px 8px;
+         border-radius: 5px;
+         border: 1px solid #ccc;
+         font-size: 14px;
+         text-align: center;
+         transition: all 0.3s ease;
+     }
+      .meditation-settings input[type="number"]:focus {
+         border-color: #39d75b;
+         box-shadow: 0 0 0 2px rgba(57, 215, 91, 0.2);
+         outline: none;
+      }
+      body.dark-mode .meditation-settings input[type="number"] {
+          background-color: #3f3f3f;
+          color: #eee;
+          border-color: #555;
+      }
+       body.dark-mode .meditation-settings input[type="number"]:focus {
+         border-color: #1DB954;
+         box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3);
+     }
+     .meditation-settings small {
+         display: block;
+         margin-top: 8px; /* More space */
+         font-size: 12px;
+         color: #777; /* Slightly darker note */
+         transition: color 0.3s;
+     }
+      body.dark-mode .meditation-settings small {
+          color: #aaa;
+      }
+
+    .meditation-widget { /* Main widget */
+      background-color: #f8f9fa; /* Match forms */
+      border-radius: 20px;
+      padding: 30px; /* Increased padding */
+      width: 320px; /* Slightly wider */
+      text-align: center;
+      color: #333;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
+      transition: all 0.3s ease;
+      border: 1px solid #eee; /* Match forms */
+    }
+     body.dark-mode .meditation-widget {
+         background-color: #2c2c2c; /* Match forms */
+         color: #ccc;
+         box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+         border-color: #3a3a3a;
+     }
+     .meditation-widget h3 {
+         margin-top: 0;
+         color: #39d75b;
+         transition: color 0.3s;
+         font-size: 1.3em; /* Adjusted size */
+     }
+      body.dark-mode .meditation-widget h3 {
+         color: #1DB954;
+      }
+
+    .timer-circle {
+      position: relative;
+      width: 160px; /* Larger circle */
+      height: 160px;
+      margin: 25px auto; /* Increased margin */
+    }
+    .timer-circle #time-display {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.8em; /* Larger time */
+        font-weight: bold;
+        color: #333;
+        transition: color 0.3s;
+    }
+     body.dark-mode .timer-circle #time-display {
+         color: #ccc;
+     }
+
+    .progress-ring {
+         width: 160px; /* Match container */
+         height: 160px;
+     }
+    .progress-ring__bg {
+        stroke: #e0e0e0; /* Slightly darker bg */
+        stroke-width: 8; /* Thicker ring */
+        fill: transparent;
+        r: 76; /* Adjusted radius for thicker stroke */
+        cx: 80; cy: 80; /* Center */
+    }
+    .progress-ring__circle {
+      /* stroke-dasharray calculated in JS now */
+      stroke-dashoffset: 0; /* Start full in JS */
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear, stroke-opacity 0.5s ease-in-out; /* Added opacity transition */
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke: #39d75b;
+      stroke-width: 8; /* Thicker ring */
+      fill: transparent;
+      r: 76; cx: 80; cy: 80; /* Match background */
+      stroke-opacity: 1; /* Default opacity */
+    }
+     /* --- New Animation: Pulse the Ring Opacity --- */
+     .progress-ring__circle.pulsing {
+         animation: pulseRingOpacity 2s ease-in-out infinite alternate;
+     }
+     @keyframes pulseRingOpacity {
+         from { stroke-opacity: 0.6; }
+         to { stroke-opacity: 1; }
+     }
+     /* --- End New Animation --- */
+
+     body.dark-mode .progress-ring__bg {
+         stroke: #444;
+     }
+     body.dark-mode .progress-ring__circle {
+         stroke: #1DB954;
+     }
+
+    .controls {
+        margin-top: 15px; /* Adjusted space */
+    }
+    .controls button {
+      background: #6c757d; /* Grey */
+      border: none;
+      color: white;
+      width: 55px; /* Slightly larger */
+      height: 55px;
+      border-radius: 50%;
+      margin: 0 12px; /* Adjusted space */
+      font-size: 22px;
+      cursor: pointer;
+      transition: all 0.2s ease; /* Faster transition */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Add shadow */
+    }
+     .controls button:hover {
+         background-color: #5a6268;
+         transform: translateY(-1px); /* Lift slightly */
+         box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+     }
+      .controls button:active {
+          transform: translateY(0px) scale(0.98); /* Push down */
+          box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      }
+     .controls button#pauseBtn.running {
+         background-color: #ffc107; /* Amber */
+     }
+      .controls button#pauseBtn.running:hover {
+         background-color: #ffca2c;
+     }
+     .controls button#resetBtn {
+         background-color: #dc3545; /* Bootstrap Red */
+     }
+      .controls button#resetBtn:hover {
+         background-color: #c82333;
+     }
+
+    .next-break {
+      margin-top: 25px; /* More space */
+      font-size: 15px; /* Slightly larger */
+      color: #666;
+      transition: color 0.3s;
+    }
+     body.dark-mode .next-break {
+         color: #999; /* Lighter grey */
+     }
+
+    /* --- Dark Mode Specific Meditation Styles --- */
+    body.dark-mode .controls button {
+         background: #495057; /* Darker Grey */
+         color: #eee;
+         box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+     }
+     body.dark-mode .controls button:hover {
+         background-color: #5a6268;
+         box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+     }
+     body.dark-mode .controls button:active {
+         box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+     }
+     body.dark-mode .controls button#pauseBtn.running {
+         background-color: #ffc107;
+     }
+     body.dark-mode .controls button#pauseBtn.running:hover {
+         background-color: #ffca2c;
+     }
+     body.dark-mode .controls button#resetBtn {
+         background-color: #dc3545;
+     }
+     body.dark-mode .controls button#resetBtn:hover {
+         background-color: #c82333;
+     }
+
+
+    /* --- Toast Notification --- */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: rgba(0, 0, 0, 0.85); /* Darker */
+      color: #fff;
+      text-align: center;
+      border-radius: 5px; /* Slightly more rounded */
+      padding: 12px 18px;
+      position: fixed;
+      z-index: 1001;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 15px; /* Adjusted size */
+      opacity: 0;
+      transition: opacity 0.4s ease, visibility 0.4s, background-color 0.3s, bottom 0.4s ease; /* Added bottom transition */
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px; /* Animate upwards slightly */
+    }
+     body.dark-mode #toast {
+         background-color: rgba(235, 235, 235, 0.9); /* Lighter */
+         color: #222; /* Dark text */
+         box-shadow: 0 3px 8px rgba(255,255,255,0.1);
+     }
+
+
+
+     /* --- Chatbot Styles --- */
+.chatbot-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa; /* Match forms */
+    border: 1px solid #eee; /* Match forms */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+}
+body.dark-mode .chatbot-section {
+    background-color: #2c2c2c; /* Match forms */
+    border-color: #3a3a3a;
+}
+.chatbot-section h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #39d75b;
+}
+body.dark-mode .chatbot-section h2 {
+    color: #1DB954;
+}
+.chatbox {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 600px; /* Limit width */
+    margin: 0 auto; /* Center */
+    background-color: #fff; /* Light background for chat area */
+}
+body.dark-mode .chatbox {
+    border-color: #444;
+    background-color: #333; /* Dark background */
+}
+.chatbox-messages {
+    height: 300px; /* Fixed height, scrollable */
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.message {
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 75%;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+.user-message {
+    background-color: #dcf8c6; /* Light green bubble */
+    color: #333;
+    align-self: flex-end;
+    border-bottom-right-radius: 3px;
+}
+.bot-message {
+    background-color: #eee; /* Light grey bubble */
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 3px;
+}
+ .bot-message.typing {
+    font-style: italic;
+    color: #888;
+ }
+body.dark-mode .user-message {
+    background-color: #056162; /* Dark green bubble */
+    color: #e1f7f7;
+}
+body.dark-mode .bot-message {
+    background-color: #4a4a4a; /* Dark grey bubble */
+    color: #eee;
+}
+ body.dark-mode .bot-message.typing {
+    color: #aaa;
+ }
+.chatbox-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+}
+body.dark-mode .chatbox-input {
+    border-top-color: #444;
+}
+#chat-input {
+    flex-grow: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 15px;
+    outline: none;
+    background-color: #fff; /* Match chatbox bg */
+    color: #000;
+}
+body.dark-mode #chat-input {
+    background-color: #333; /* Match chatbox bg */
+    color: #eee;
+}
+#chat-send-btn {
+    padding: 10px 20px;
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s;
+}
+#chat-send-btn:hover {
+    background-color: #18a94a;
+}
+body.dark-mode #chat-send-btn {
+    background-color: #18a94a;
+}
+body.dark-mode #chat-send-btn:hover {
+    background-color: #148d3e;
+}
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="dark-mode-toggle">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙</label> <div id="toast"></div>
+
+  <table class="layout-table">
+    <tr>
+      <td class="sidebar-cell">
+        <h2>FitSync</h2>
+        <ul>
+          <li><button class="pill-button"><a href="Home.html">📊 Dashboard</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">📅 Schedule ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="workout.html">Workout Plan</a></button></li>
+              <li><button class="pill-button"><a href="Diet/diet.html" target="_blank">Meal Plan</a></button></li>
+              <li><button class="pill-button"><a href="schedule.html" target="_blank">Calendar</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="Community/comm.html">💬 Community</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">⚙️ Settings ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="Settings/profile.php">Profile</a></button></li>
+              <li><button class="pill-button"><a href="Settings/privacy.html">Privacy</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="logout.php">🔒 Logout</a></button></li>
+        </ul>
+
+      </td>
+      <td class="main-cell">
+        <header>
+          <h1>Welcome Back 🎉</h1>
+        </header>
+        <hr>
+
+        <form id="statsForm">
+          <h4>Add Today's Stats:</h4>
+          <label for="stepsInput">Steps:</label>
+          <input type="number" id="stepsInput" placeholder="e.g., 5000">
+          <label for="waterInput">Water (L):</label>
+          <input type="number" step="0.1" id="waterInput" placeholder="e.g., 0.5">
+          <label for="caloriesInput">Calories:</label>
+          <input type="number" id="caloriesInput" placeholder="e.g., 300">
+          <label for="heartRateInput">Avg Heart Rate:</label>
+          <input type="number" id="heartRateInput" placeholder="e.g., 75">
+          <button type="button" onclick="updateManualStats()">Add Stats</button>
+        </form>
+
+        <section class="stats">
+          <div class="card steps">
+            Steps: <strong id="stepsDisplay">0</strong>
+          </div>
+          <div class="card water">
+            Water: <strong id="waterDisplay">0 L</strong>
+          </div>
+          <div class="card calories">
+            Calories: <strong id="caloriesDisplay">0</strong>
+          </div>
+          <div class="card heart-rate">
+            Heart Rate: <strong id="heartRateDisplay">-- bpm</strong>
+          </div>
+        </section>
+         <hr>
+
+        <section class="progress">
+          <h2>Track Your Goals</h2>
+          <form id="progressForm">
+            <div>
+              <label for="running">🏃 Running (km):</label>
+              <input type="number" step="0.1" id="running" placeholder="Current km">
+              <label for="runningGoal">Goal:</label>
+              <input type="number" step="0.1" id="runningGoal" placeholder="Goal km">
+            </div>
+            <br>
+            <div>
+              <label for="sleeping">💤 Sleeping (hrs):</label>
+              <input type="number" step="0.1" id="sleeping" placeholder="Current hrs">
+              <label for="sleepingGoal">Goal:</label>
+              <input type="number" step="0.1" id="sleepingGoal" placeholder="Goal hrs">
+            </div>
+            <br>
+            <div>
+              <label for="weightLoss">⚖️ Current Weight (kg):</label>
+              <input type="number" step="0.1" id="weightLoss" placeholder="Your weight">
+              <label for="weightGoal">Goal:</label>
+              <input type="number" step="0.1" id="weightGoal" placeholder="Target kg">
+            </div>
+            <br>
+            <button type="button" onclick="updateProgressFromInput()">Update Progress Display</button>
+          </form>
+          <ul id="progressDisplay">
+            <li>🏃 Running: 0km / 0km</li>
+            <li>💤 Sleeping: 0hrs / 0hrs</li>
+            <li>⚖️ Weight: 0kg / 0kg</li>
+          </ul>
+        </section>
+         <hr>
+
+         <hr>
+         <section class="chatbot-section" id="chatbot-section">
+             <h2>AI Assistant</h2>
+             <div class="chatbox">
+                 <div class="chatbox-messages" id="chatbox-messages">
+                     <div class="message bot-message">Hi <?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?>! How can I help you today?</div>
+                 </div>
+                 <div class="chatbox-input">
+                     <input type="text" id="chat-input" placeholder="Type your message...">
+                     <button id="chat-send-btn">Send</button>
+                 </div>
+             </div>
+         </section>
+         <hr>
+
+        <section class="meditation-section" id="meditation-section">
+
+             <div class="meditation-settings">
+                 <label for="focusDurationInput">Focus (min):</label> <input type="number" id="focusDurationInput" min="1" value="25" title="Focus duration in minutes">
+                 <label for="breakDurationInput">Break (min):</label> <input type="number" id="breakDurationInput" min="1" value="5" title="Break duration in minutes">
+                 <small>Press Reset (🔁) to apply changes.</small> </div>
+
+             <div class="meditation-widget">
+                 <h3 id="meditation-status">🧘 Focus Period (1 / 2)</h3>
+                 <div class="timer-circle">
+                     <div id="time-display">25:00</div>
+                     <svg class="progress-ring" >
+                         <circle class="progress-ring__bg" />
+                         <circle class="progress-ring__circle" />
+                     </svg>
+                 </div>
+                 <div class="controls">
+                     <button id="pauseBtn" title="Start/Pause Timer">▶</button>
+                     <button id="resetBtn" title="Reset Timer & Apply Custom Times">🔁</button>
+                 </div>
+                 <p class="next-break" id="next-break-text">Up next: <strong>5 min break</strong></p>
+             </div>
+        </section>
+        <hr>
+
+
+        <section class="bmi-section">
+          <div class="bmi-container">
+            <h2>BMI Calculator</h2>
+            <form id="bmiForm">
+              <label for="bmiWeight">Weight (kg):</label>
+              <input type="number" step="0.1" id="bmiWeight" required>
+              <label for="bmiHeight">Height (cm):</label>
+              <input type="number" id="bmiHeight" required>
+              <button type="button" onclick="calculateBMI()">Calculate BMI</button>
+            </form>
+            <div class="result" id="bmiResult">Enter weight and height to calculate BMI.</div>
+            <div class="bar-container">
+              <div class="bar" id="bmiBar"></div>
+            </div>
+            <div class="bar-label" id="bmiLabel"></div>
+          </div>
+        </section>
+
+        <section class="bri-section">
+          <div class="bri-container">
+            <h2>Body Roundness Index (BRI) Calculator</h2>
+            <form id="briForm">
+              <label for="briHeight">Height (cm):</label>
+              <input type="number" id="briHeight" placeholder="Enter height in cm" required>
+              <label for="briWaist">Waist Circumference (cm):</label>
+              <input type="number" id="briWaist" placeholder="Enter waist circumference in cm" required>
+              <button type="button" onclick="calculateBRI()">Calculate BRI</button>
+            </form>
+            <div class="result" id="briResult">Enter height and waist circumference to calculate BRI.</div>
+          </div>
+        </section>
+      </td>
+    </tr>
+  </table>
+
+  <script src="https://apis.google.com/js/api.js" async defer></script> <script>
+    // Wrap most code in DOMContentLoaded to ensure elements exist
+    document.addEventListener('DOMContentLoaded', () => {
+ // ======================================================
+        // === Reminders ===
+        // ======================================================
+    // --- Water Reminder Toast Notification ---
+    const waterReminderIntervalHours = 2;
+    const waterReminderIntervalMillis = waterReminderIntervalHours * 1 * 6 * 1000;
+    let waterReminderTimerId = null;
+
+    function triggerWaterReminder() {
+        console.log("Triggering water reminder toast...");
+        // Use your existing showToast function
+        showToast(`💧 Time to drink some water! Stay hydrated. (${new Date().toLocaleTimeString()})`);
+
+        // --- Add reminder to database for email notification ---
+        // This part requires a backend endpoint (like add_reminder.php)
+        // and needs the user_id, which isn't directly available in Home.html
+        // without fetching it or embedding it from PHP during page load.
+        // For simplicity, we'll skip adding it to DB from here for now.
+        
+        const reminderTime = new Date(); // Set reminder time to now for immediate backend processing
+        const reminderData = {
+            title: 'Drink Water',
+            // Format time for SQL DATETIME (YYYY-MM-DD HH:MM:SS)
+            reminder_time: reminderTime.toISOString().slice(0, 19).replace('T', ' ')
+        };
+
+        fetch('api/add_reminder.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reminderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Water reminder logged to DB for potential email.");
+            } else {
+                console.error("Failed to log water reminder to DB:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error logging water reminder:', error);
+        });
+
+    }
+
+    function startWaterReminderTimer() {
+        // Clear any existing timer
+        if (waterReminderTimerId !== null) {
+            clearInterval(waterReminderTimerId);
+        }
+        console.log(`Starting water reminder timer (${waterReminderIntervalHours} hours). Next reminder check at ${new Date(Date.now() + waterReminderIntervalMillis).toLocaleTimeString()}`);
+        // Set the interval
+        waterReminderTimerId = setInterval(triggerWaterReminder, waterReminderIntervalMillis);
+
+        // Optional: Trigger one immediately on load *if* desired (uncomment below)
+        // triggerWaterReminder();
+    }
+
+    // Start the timer when the page loads
+    startWaterReminderTimer();
+
+    // (Keep existing code like BMI, BRI, Meditation, Chatbot, Dark Mode etc. here)
+
+// End DOMContentLoaded
+
+
+
+
+        // ======================================================
+        // === GENERAL UTILITIES (Toast, Cookies, Dark Mode) ===
+        // ======================================================
+        // (Keep the Toast, Cookie, Dark Mode functions as previously defined)
+         // Toast Notification Function
+        const toast = document.getElementById('toast');
+        let toastTimeoutId = null;
+        function showToast(message) {
+          if (!toast) return;
+          toast.innerText = message;
+          toast.classList.add('show');
+          if (toastTimeoutId) clearTimeout(toastTimeoutId);
+          toastTimeoutId = setTimeout(() => {
+            toast.classList.remove('show');
+            toastTimeoutId = null;
+          }, 3000);
+        }
+
+        // Cookie and Dark Mode Management (IIFE)
+        (function() {
+          function setCookie(name, value, days) { /* ... same as before ... */
+            let expires = ""; if (days) { let date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); expires = "; expires=" + date.toUTCString(); } document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax"; }
+          function getCookie(name) { /* ... same as before ... */
+            let nameEQ = name + "="; let cookiesArray = document.cookie.split(';'); for (let i = 0; i < cookiesArray.length; i++) { let c = cookiesArray[i].trim(); if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); } } return null; }
+          function applyDarkMode() { /* ... same as before ... */
+             let darkModeEnabled = getCookie("darkMode"); let bodyClassList = document.body.classList; let toggle = document.getElementById("dark-mode-toggle"); if (darkModeEnabled === "true") { bodyClassList.add("dark-mode"); if (toggle) toggle.checked = true; } else { bodyClassList.remove("dark-mode"); if (toggle) toggle.checked = false; } }
+          var darkModeToggle = document.getElementById("dark-mode-toggle"); if (darkModeToggle) { darkModeToggle.addEventListener("change", function() { if (this.checked) { document.body.classList.add("dark-mode"); setCookie("darkMode", "true", 30); } else { document.body.classList.remove("dark-mode"); setCookie("darkMode", "false", 30); } }); }
+          applyDarkMode(); // Apply on initial script execution after DOM load
+          window.addEventListener("pageshow", function(event) { if (event.persisted) { applyDarkMode(); } });
+        })();
+
+
+        // ==========================================
+        // === MANUAL STATS & PROGRESS TRACKING ===
+        // ==========================================
+        // (Keep the updateManualStats and updateProgressFromInput functions as previously defined)
+         // Update Manual Stats
+        window.updateManualStats = function() { // Attach to window explicitly if needed
+             const stepsInput = document.getElementById('stepsInput'); const waterInput = document.getElementById('waterInput'); const caloriesInput = document.getElementById('caloriesInput'); const heartRateInput = document.getElementById('heartRateInput'); const stepsDisplay = document.getElementById('stepsDisplay'); const waterDisplay = document.getElementById('waterDisplay'); const caloriesDisplay = document.getElementById('caloriesDisplay'); const heartRateDisplay = document.getElementById('heartRateDisplay'); const addSteps = parseInt(stepsInput.value, 10) || 0; const addWater = parseFloat(waterInput.value) || 0; const addCalories = parseInt(caloriesInput.value, 10) || 0; const newHeartRate = parseInt(heartRateInput.value, 10); const currentSteps = parseInt(stepsDisplay.innerText, 10) || 0; const currentWaterMatch = waterDisplay.innerText.match(/[\d.]+/); const currentWater = currentWaterMatch ? parseFloat(currentWaterMatch[0]) : 0; const currentCalories = parseInt(caloriesDisplay.innerText, 10) || 0; const totalSteps = currentSteps + addSteps; const totalWater = currentWater + addWater; const totalCalories = currentCalories + addCalories; stepsDisplay.innerText = totalSteps; waterDisplay.innerText = totalWater.toFixed(1) + ' L'; caloriesDisplay.innerText = totalCalories; if (!isNaN(newHeartRate)) { heartRateDisplay.innerText = newHeartRate + ' bpm'; } stepsInput.value = ''; waterInput.value = ''; caloriesInput.value = ''; heartRateInput.value = ''; showToast('Stats updated!'); }
+        // Update Progress Goal Display
+        window.updateProgressFromInput = function() { // Attach to window
+             const running = document.getElementById('running').value || 0; const runningGoal = document.getElementById('runningGoal').value || 0; const sleeping = document.getElementById('sleeping').value || 0; const sleepingGoal = document.getElementById('sleepingGoal').value || 0; const weight = document.getElementById('weightLoss').value || 0; const weightGoal = document.getElementById('weightGoal').value || 0; const progressDisplay = document.getElementById('progressDisplay'); progressDisplay.innerHTML = `<li>🏃 Running: ${running}km / ${runningGoal}km</li><li>💤 Sleeping: ${sleeping}hrs / ${sleepingGoal}hrs</li><li>⚖️ Weight: ${weight}kg / ${weightGoal}kg</li>`; /*showToast('Progress display updated!');*/ } // Toast removed as it fires on load now
+         updateProgressFromInput(); // Initialize progress display
+
+
+        // ==========================================
+        // === BMI & BRI CALCULATORS ===
+        // ==========================================
+        // (Keep calculateBMI and calculateBRI functions as previously defined)
+         window.calculateBMI = function() { /* ... same as before ... */
+            const weight = parseFloat(document.getElementById('bmiWeight').value); const height = parseFloat(document.getElementById('bmiHeight').value); const resultDiv = document.getElementById('bmiResult'); const bmiBar = document.getElementById('bmiBar'); const bmiLabel = document.getElementById('bmiLabel'); resultDiv.innerText = ''; bmiBar.style.width = '0%'; bmiBar.className = 'bar'; bmiLabel.innerText = ''; if (weight > 0 && height > 0) { const heightInMeters = height / 100; const bmi = weight / (heightInMeters * heightInMeters); resultDiv.innerText = `Your BMI is ${bmi.toFixed(2)}`; let category = ''; let barClass = ''; const bmiPercentage = Math.min((bmi / 40) * 100, 100); if (bmi < 18.5) { category = 'Underweight'; barClass = 'bmi-underweight'; } else if (bmi < 24.9) { category = 'Normal weight'; barClass = 'bmi-normal'; } else if (bmi < 29.9) { category = 'Overweight'; barClass = 'bmi-overweight'; } else { category = 'Obesity'; barClass = 'bmi-obesity'; } bmiBar.style.width = `${bmiPercentage}%`; bmiBar.classList.add(barClass); bmiLabel.innerText = category; showToast('BMI calculated!'); } else { resultDiv.innerText = 'Please enter valid positive values for weight and height.'; } }
+        window.calculateBRI = function() { /* ... same as before ... */
+            const heightInput = document.getElementById('briHeight'); const waistInput = document.getElementById('briWaist'); const resultDiv = document.getElementById('briResult'); const height = parseFloat(heightInput.value); const waist = parseFloat(waistInput.value); resultDiv.innerHTML = ''; if (height > 0 && waist > 0) { const heightM = height / 100; const eccentricityTerm = (waist / (2 * Math.PI))**2 / heightM**2; if (eccentricityTerm >= 1) { resultDiv.innerHTML = `<p class="error">Invalid input for BRI calculation (waist too large for height).</p>`; return; } const bri = 364.2 - 365.5 * Math.sqrt(1 - eccentricityTerm); let interpretation = ''; let interpretationClass = ''; if (bri < 3.5) { interpretation = "Lower Range (Consult professional if concerned)"; interpretationClass = 'bri-healthy'; } else if (bri < 5) { interpretation = "Moderate Range (Generally considered lower health risk)"; interpretationClass = 'bri-healthy'; } else if (bri < 7) { interpretation = "Elevated Range (Potentially increased health risk)"; interpretationClass = 'bri-overweight'; } else { interpretation = "High Range (Potentially high health risk)"; interpretationClass = 'bri-highrisk'; } resultDiv.innerHTML = `<h2>Your BRI: ${bri.toFixed(2)}</h2><p class="bri-result-text ${interpretationClass}">${interpretation}</p>`; showToast('BRI calculated!'); } else { resultDiv.innerHTML = `<p class="error">Please enter valid positive values for height and waist!</p>`; } }
+
+
+        // ==================================
+        // === MEDITATION TIMER LOGIC ===
+        // ==================================
+        const timeDisplay = document.getElementById('time-display');
+        const statusDisplay = document.getElementById('meditation-status');
+        const nextBreakText = document.getElementById('next-break-text');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        // Removed plant reference
+        const progressCircle = document.querySelector('.meditation-widget .progress-ring__circle');
+        const focusDurationInput = document.getElementById('focusDurationInput');
+        const breakDurationInput = document.getElementById('breakDurationInput');
+
+        // Constants and State Variables
+        const DEFAULT_FOCUS_MINS = 25;
+        const DEFAULT_BREAK_MINS = 5;
+        const TOTAL_FOCUS_PERIODS = 2;
+        const CIRCLE_ELEMENT = progressCircle; // Reference to the circle element
+        const RADIUS = CIRCLE_ELEMENT.r.baseVal.value;
+        const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+        let timerInterval = null;
+        let currentDuration = getDurationFromInput(focusDurationInput, DEFAULT_FOCUS_MINS); // Initial duration
+        let timeRemaining = currentDuration;
+        let isPaused = true;
+        let isBreak = false;
+        let focusPeriodCount = 1;
+
+        // --- Helper Functions ---
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function getDurationFromInput(inputElement, defaultMinutes) {
+            const minutes = parseInt(inputElement.value, 10);
+            return (isNaN(minutes) || minutes < 1 ? defaultMinutes : minutes) * 60;
+        }
+
+        // --- Core Timer Functions ---
+        function updateProgressRing() {
+            const safeDuration = currentDuration > 0 ? currentDuration : 1;
+            const progress = (safeDuration - timeRemaining) / safeDuration;
+            const clampedProgress = Math.max(0, Math.min(1, progress));
+            const dashOffset = CIRCUMFERENCE * (1 - clampedProgress);
+            // Set calculated dasharray and initial offset on the element
+            CIRCLE_ELEMENT.style.strokeDasharray = `${CIRCUMFERENCE} ${CIRCUMFERENCE}`;
+            CIRCLE_ELEMENT.style.strokeDashoffset = dashOffset;
+        }
+
+
+        function updateDisplay() {
+            timeDisplay.textContent = formatTime(timeRemaining);
+            updateProgressRing();
+
+            const userBreakSeconds = getDurationFromInput(breakDurationInput, DEFAULT_BREAK_MINS);
+            const userBreakMinutes = Math.floor(userBreakSeconds / 60);
+
+            if (isBreak) {
+                statusDisplay.textContent = `🧘 Break Time`;
+                 const nextFocusNum = (focusPeriodCount >= TOTAL_FOCUS_PERIODS) ? 1 : focusPeriodCount + 1;
+                 nextBreakText.innerHTML = `Up next: <strong>Focus Period (${nextFocusNum} / ${TOTAL_FOCUS_PERIODS})</strong>`;
+            } else {
+                 statusDisplay.textContent = `🧘 Focus Period (${focusPeriodCount} / ${TOTAL_FOCUS_PERIODS})`;
+                 nextBreakText.innerHTML = `Up next: <strong>${userBreakMinutes} min break</strong>`;
+            }
+        }
+
+        function startTimer() {
+            if (timeRemaining <= 0 || !isPaused) return; // Prevent starting if 0 or already running
+            if (timerInterval) clearInterval(timerInterval);
+
+            isPaused = false;
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.add('running');
+            progressCircle.classList.add('pulsing'); // Add pulsing animation to ring
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateDisplay();
+
+                if (timeRemaining < 0) {
+                    timeRemaining = 0;
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    progressCircle.classList.remove('pulsing'); // Stop pulsing
+                    switchState();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isPaused && timerInterval) { // Only pause if running
+                clearInterval(timerInterval);
+                timerInterval = null;
+                isPaused = true;
+                pauseBtn.textContent = '▶';
+                pauseBtn.classList.remove('running');
+                progressCircle.classList.remove('pulsing'); // Stop pulsing
+                showToast('Timer paused.');
+            }
+        }
+
+        function switchState() {
+             showToast(isBreak ? 'Break finished! Time to focus.' : 'Focus period done! Take a break.');
+             progressCircle.classList.remove('pulsing'); // Ensure pulsing stops
+
+            if (isBreak) { // Finishing break -> Start next Focus
+                isBreak = false;
+                focusPeriodCount++;
+                 if (focusPeriodCount > TOTAL_FOCUS_PERIODS) {
+                    resetTimer(true); // Pass flag to indicate cycle completion
+                    showToast('Meditation cycle complete! Timer reset.');
+                    return;
+                }
+                currentDuration = getDurationFromInput(focusDurationInput, DEFAULT_FOCUS_MINS);
+            } else { // Finishing focus -> Start Break
+                isBreak = true;
+                currentDuration = getDurationFromInput(breakDurationInput, DEFAULT_BREAK_MINS);
+            }
+
+            timeRemaining = currentDuration;
+            isPaused = true;
+            pauseBtn.textContent = '▶';
+            pauseBtn.classList.remove('running');
+            // Set stroke-dashoffset to full immediately for the new period
+            CIRCLE_ELEMENT.style.strokeDashoffset = CIRCUMFERENCE;
+            // Short delay before updating display to ensure offset reset is rendered
+            setTimeout(updateDisplay, 50);
+        }
+
+        // Added optional flag to prevent toast on initial load reset
+        function resetTimer(showMsg = true) {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            isPaused = true;
+            isBreak = false;
+            focusPeriodCount = 1;
+            currentDuration = getDurationFromInput(focusDurationInput, DEFAULT_FOCUS_MINS);
+            timeRemaining = currentDuration;
+            pauseBtn.textContent = '▶';
+            pauseBtn.classList.remove('running');
+            progressCircle.classList.remove('pulsing'); // Stop pulsing
+            CIRCLE_ELEMENT.style.strokeDasharray = `${CIRCUMFERENCE} ${CIRCUMFERENCE}`; // Set dasharray
+            CIRCLE_ELEMENT.style.strokeDashoffset = CIRCUMFERENCE; // Reset ring
+
+            function updateProgressRing() {
+            // Ensure CIRCLE_ELEMENT and CIRCUMFERENCE are valid before proceeding
+            if (!CIRCLE_ELEMENT || typeof CIRCUMFERENCE === 'undefined' || isNaN(CIRCUMFERENCE)) {
+                console.error("updateProgressRing: Missing or invalid CIRCLE_ELEMENT or CIRCUMFERENCE.");
+                return;
+            }
+
+            const safeDuration = currentDuration > 0 ? currentDuration : 1;
+            // Calculate fraction of time ELAPSED
+            const fractionElapsed = (safeDuration - timeRemaining) / safeDuration;
+            // Clamp between 0 and 1
+            const clampedFraction = Math.max(0, Math.min(1, fractionElapsed));
+            // Offset grows from 0 to CIRCUMFERENCE as time elapses
+            const dashOffset = CIRCUMFERENCE * clampedFraction;
+
+            // --- DEBUG LOG ---
+            console.log(`Time: ${timeRemaining}s / ${safeDuration}s | Fraction Elapsed: ${clampedFraction.toFixed(3)} | Calculated Offset: ${dashOffset.toFixed(2)} (Circumference: ${CIRCUMFERENCE.toFixed(2)})`);
+            // --- END DEBUG LOG ---
+
+            // Set calculated dasharray and offset
+            CIRCLE_ELEMENT.style.strokeDasharray = `${CIRCUMFERENCE} ${CIRCUMFERENCE}`;
+            CIRCLE_ELEMENT.style.strokeDashoffset = dashOffset;
+        }
+          
+
+            updateDisplay(); // Update text and ring
+            if (showMsg) {
+                showToast('Timer reset & custom times applied.');
+            }
+        }
+
+        // --- Event Listeners ---
+        pauseBtn.addEventListener('click', () => {
+            if (isPaused) { startTimer(); } else { pauseTimer(); }
+        });
+        resetBtn.addEventListener('click', () => resetTimer(true)); // Ensure toast shows on manual reset
+
+        // --- Initial Setup ---
+        resetTimer(false); // Initial setup without showing toast
+
+    }); // End DOMContentLoaded
+</script>
+ 
+<script>
+  // --- Chatbot Functionality ---
+  const chatMessages = document.getElementById('chatbox-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    let conversationHistory = []; // Optional: Store history for context
+
+    function addChatMessage(message, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+        messageDiv.textContent = message;
+        chatMessages.appendChild(messageDiv);
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTypingIndicator(show = true) {
+        let typingIndicator = chatMessages.querySelector('.typing');
+        if (show && !typingIndicator) {
+            typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('message', 'bot-message', 'typing');
+            typingIndicator.textContent = 'AI is typing...';
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else if (!show && typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    function sendMessageToBot() {
+        const messageText = chatInput.value.trim();
+        if (messageText === '') return;
+
+        addChatMessage(messageText, 'user');
+        chatInput.value = ''; // Clear input
+        showTypingIndicator(true);
+
+        // Optional: Add user message to history
+        // conversationHistory.push({"role": "user", "content": messageText});
+
+        // Send to backend
+        fetch('api/chatbot_handler.php', { // Ensure this path is correct
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // Send only the latest message for simplicity, or send history
+            body: JSON.stringify({ message: messageText /*, history: conversationHistory */ })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                     throw new Error(errData.message || `HTTP error ${response.status}`);
+                }).catch(() => { throw new Error(`HTTP error ${response.status}`); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showTypingIndicator(false);
+            if (data.success && data.reply) {
+                addChatMessage(data.reply, 'bot');
+                // Optional: Add bot response to history
+                // conversationHistory.push({"role": "assistant", "content": data.reply});
+            } else {
+                addChatMessage(data.message || 'Sorry, something went wrong.', 'bot');
+            }
+        })
+        .catch(error => {
+            showTypingIndicator(false);
+            console.error('Chatbot fetch error:', error);
+            addChatMessage(`Error: ${error.message}`, 'bot');
+        });
+    }
+
+    chatSendBtn.addEventListener('click', sendMessageToBot);
+    chatInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessageToBot();
+        }
+    });
+
+</script>
+
+</body>
+</html>

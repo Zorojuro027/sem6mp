@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitSync Privacy Policy</title>
+    <style>
+        /* Base Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background-color: #fff; 
+            color: #000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .layout-table { 
+            width: 100%; 
+            height: 100vh; 
+            border-collapse: collapse;
+        }
+        /* Sidebar Styling (Updated) */
+        .sidebar-cell {
+            width: 20%;
+            vertical-align: top;
+            background-color: #39d75b;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .sidebar-cell h2 {
+            margin: 0 0 20px;
+            font-size: 28px;
+            color: #000;
+            transition: color 0.3s;
+        }
+        .sidebar-cell ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-cell ul li {
+            margin: 20px 0;
+            position: relative;
+        }
+        .pill-button {
+            background-color: #39d75b;
+            border: 2px solid #000;
+            border-radius: 30px;
+            color: #000;
+            padding: 10px 20px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pill-button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        /* Dropdown (Accordion) */
+        .dropdown-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-left: 20px;
+        }
+        .dropdown:hover .dropdown-menu {
+            max-height: 300px;
+        }
+        .dropdown-menu li {
+            margin: 10px 0;
+        }
+        /* Main Content Styling */
+        .main-cell {
+            width: 80%;
+            vertical-align: top;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        header h1 {
+            margin-top: 0;
+        }
+        article h2 {
+            margin-top: 20px;
+        }
+        /* Dark Mode Toggle Button */
+        .dark-mode-btn {
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+        .dark-mode-btn:hover {
+            background-color: #444;
+        }
+        /* Dark Mode Overrides */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ccc;
+        }
+        body.dark-mode .sidebar-cell {
+            background-color: #1AA447;
+            color: #ccc;
+            border-right: 1px solid #333;
+        }
+        body.dark-mode .main-cell {
+            background-color: #191414;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Dark Mode Toggle -->
+    <input type="checkbox" id="dark-mode-toggle" style="display:none;">
+    <label for="dark-mode-toggle" class="dark-mode-btn">🌙 Dark Mode</label>
+
+    <!-- Toast Notification (if needed) -->
+    <div id="toast"></div>
+
+    <table class="layout-table">
+        <tr>
+            <td class="sidebar-cell">
+              <h2>FitSync</h2>
+              <ul>
+                <li><button class="pill-button"><a href="../Home.html">📊 Dashboard</a></button></li>
+                <li class="dropdown">
+                  <button class="pill-button">📅 Schedule ▼</button>
+                  <ul class="dropdown-menu">
+                    <li><button class="pill-button"><a href="/workout.html">Workout Plan</a></button></li>
+                    <li><button class="pill-button"><a href="Diet/diet.html" target="_blank">Meal Plan</a></button></li>
+                    <li><button class="pill-button"><a href="/schedule.html" target="_blank">Calendar</a></button></li>
+                  </ul>
+                </li>
+                <li><button class="pill-button"><a href="Community/comm.html">💬 Community</a></button></li>
+                <li class="dropdown">
+                  <button class="pill-button">⚙️ Settings ▼</button>
+                  <ul class="dropdown-menu">
+                    <li><button class="pill-button"><a href="../Settings/profile.html">Profile</a></button></li>
+                    <li><button class="pill-button"><a href="../Settings/privacy.html">Privacy</a></button></li>
+                  </ul>
+                </li>
+                <li><button class="pill-button"><a href="../logout.php">🔒 Logout</a></button></li>
+              </ul>
+            </td>
+            <!-- Main Content-->
+            <td class="main-cell">
+                <header>
+                    <h1>Privacy Policy</h1>
+                </header>
+                <article>
+                    <p>Your privacy is important to us. At FitSync, we are committed to protecting the personal information you share with us. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.</p>
+                    
+                    <h2>Information Collection</h2>
+                    <p>We may collect personal information such as your name, email address, and other contact details when you sign up for an account. This information is used to provide you with the best possible experience and to communicate important updates.</p>
+                    
+                    <h2>Use of Information</h2>
+                    <p>Your information is used to personalize your experience, improve our website functionality, and send periodic updates or offers. We do not share your personal data with third parties except as required by law or to protect our rights.</p>
+                    
+                    <h2>Cookies</h2>
+                    <p>Our website uses cookies to store preferences such as your dark mode setting and meal preferences. Cookies help enhance your browsing experience and allow us to provide personalized features.</p>
+                    
+                    <h2>Data Security</h2>
+                    <p>We implement various security measures to protect your personal information. However, please note that no method of data transmission or storage is completely secure.</p>
+                    
+                    <h2>Changes to This Policy</h2>
+                    <p>This Privacy Policy may be updated periodically. Any changes will be posted on this page and, where appropriate, communicated to you by email.</p>
+                    
+                    <h2>Contact Us</h2>
+                    <p>If you have any questions about our Privacy Policy, please contact us at <a href="mailto:privacy@fitsync.com">privacy@fitsync.com</a>.</p>
+                </article>
+            </td>
+        </tr>
+    </table>
+    
+    <script>
+        // Basic dark mode toggle functionality
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        darkModeToggle.addEventListener('change', function() {
+            if(this.checked) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        });
+
+        
+    </script>
+
+    <script>
+       // ======================================================
+        // === GENERAL UTILITIES (Toast, Cookies, Dark Mode) ===
+        // ======================================================
+        // (Keep the Toast, Cookie, Dark Mode functions as previously defined)
+         // Toast Notification Function
+         const toast = document.getElementById('toast');
+        let toastTimeoutId = null;
+        function showToast(message) {
+          if (!toast) return;
+          toast.innerText = message;
+          toast.classList.add('show');
+          if (toastTimeoutId) clearTimeout(toastTimeoutId);
+          toastTimeoutId = setTimeout(() => {
+            toast.classList.remove('show');
+            toastTimeoutId = null;
+          }, 3000);
+        }
+
+        // Cookie and Dark Mode Management (IIFE)
+        (function() {
+          function setCookie(name, value, days) { /* ... same as before ... */
+            let expires = ""; if (days) { let date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); expires = "; expires=" + date.toUTCString(); } document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax"; }
+          function getCookie(name) { /* ... same as before ... */
+            let nameEQ = name + "="; let cookiesArray = document.cookie.split(';'); for (let i = 0; i < cookiesArray.length; i++) { let c = cookiesArray[i].trim(); if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); } } return null; }
+          function applyDarkMode() { /* ... same as before ... */
+             let darkModeEnabled = getCookie("darkMode"); let bodyClassList = document.body.classList; let toggle = document.getElementById("dark-mode-toggle"); if (darkModeEnabled === "true") { bodyClassList.add("dark-mode"); if (toggle) toggle.checked = true; } else { bodyClassList.remove("dark-mode"); if (toggle) toggle.checked = false; } }
+          var darkModeToggle = document.getElementById("dark-mode-toggle"); if (darkModeToggle) { darkModeToggle.addEventListener("change", function() { if (this.checked) { document.body.classList.add("dark-mode"); setCookie("darkMode", "true", 30); } else { document.body.classList.remove("dark-mode"); setCookie("darkMode", "false", 30); } }); }
+          applyDarkMode(); // Apply on initial script execution after DOM load
+          window.addEventListener("pageshow", function(event) { if (event.persisted) { applyDarkMode(); } });
+        })();
+
+        // --- Initial Load Actions ---
+        applyDarkModePreference();
+
+        // Add fallback text if elements might not load data immediately
+        if(profileName && !profileName.textContent) profileName.textContent = "User Name";
+        if(profileEmail && !profileEmail.textContent) profileEmail.textContent = "user@example.com";
+        const memberSinceEl = document.getElementById('memberSince');
+        if(memberSinceEl && !memberSinceEl.textContent) memberSinceEl.textContent = "N/A";
+
+        // Logout link functionality (if needed, though href usually handles it)
+        // const logoutLink = document.querySelector('a[href="../logout.php"]');
+        // if(logoutLink) { ... }
+
+        // Reload page if navigated back to via history (useful if state changes aren't dynamic)
+        window.onpageshow = function(event) {
+          if (event.persisted) {
+            window.location.reload();
+          }
+        };
+
+      // End DOMContentLoaded
+    </script>
+</body>
+</html>

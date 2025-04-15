@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Diet - FitSync</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Base Variables */
+    :root {
+      --green-bg: #39d75b; /* Adjust to match your exact bright green shade */
+      --dark-text: #000;
+      --sidebar-width: 250px;
+      --transition-speed: 0.3s;
+
+      /* Light Mode Colors */
+      --light-bg: #f4f4f4;
+      --main-bg: #fff;
+      --light-text: #333;
+      --gallery-bg: #e8f5e9;
+      --gallery-border: #c8e6c9;
+
+      /* Dark Mode Overwrites */
+      --dark-mode-bg: #121212;
+      --dark-mode-text: #e0e0e0;
+      --dark-mode-main: #1e1e1e;
+      --dark-mode-gallery: #2a2a2a;
+      --dark-mode-gallery-border: #3a3a3a;
+    }
+
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--light-text);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+    .layout-table {
+      width: 100%;
+      height: 100vh;
+      border-collapse: collapse;
+    }
+
+    /* ================================================== */
+    /* === Styles Copied/Adapted from Home.html START === */
+    /* ================================================== */
+
+    /* Base Layout - Adjusted for Diet context */
+    body { /* Re-declared for clarity, merged with global */
+      font-family: Arial, sans-serif; /* Keep Home.html font */
+      margin: 0;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Removed .layout-table here, assume it's used */
+    .sidebar-cell {
+      width: 20%; /* Match Home.html */
+      min-width: 180px; /* Match Home.html */
+      vertical-align: top;
+      background-color: #39d75b; /* Match Home.html */
+      padding: 10px; /* Match Home.html */
+      border-right: 1px solid #ccc; /* Match Home.html */
+      transition: background-color 0.3s, color 0.3s; /* Match Home.html */
+    }
+    .main-cell {
+      width: 80%; /* Match Home.html */
+      vertical-align: top;
+      padding: 30px; /* Keep original main-cell padding */
+      transition: background-color 0.3s, color 0.3s; /* Match Home.html */
+    }
+    /* Dark Mode Toggle Button (floating at top-right) */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+      font-size: 14px; /* Match Home.html */
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+    /* Dark Mode Colors (Spotify-inspired) */
+    body.dark-mode { /* Combined from Home.html and original */
+      background-color: var(--dark-mode-bg); /* Use original variable if preferred */
+      color: var(--dark-mode-text); /* Use original variable if preferred */
+    }
+    body.dark-mode .sidebar-cell {
+      background-color: #1AA447; /* Match Home.html */
+      color: #ccc; /* Match Home.html */
+      border-right: 1px solid #333; /* Match Home.html */
+    }
+    body.dark-mode .main-cell {
+      background-color: var(--dark-mode-main); /* Use original variable if preferred */
+      color: var(--dark-mode-text); /* Use original variable if preferred */
+    }
+    body.dark-mode .pill-button {
+      background-color: #1DB954; /* Match Home.html */
+      color: #000000; /* Match Home.html */
+      border: 2px solid #004c0a; /* Match Home.html */
+    }
+     body.dark-mode .pill-button a {
+        color: #000000; /* Match Home.html */
+     }
+    body.dark-mode a { /* General link color in dark mode */
+      color: #1DB954; /* Match Home.html */
+    }
+     body.dark-mode a:hover { /* General link hover in dark mode */
+         color: #ffffff; /* Match Home.html */
+     }
+
+    /* Sidebar Styling */
+    .sidebar-cell h2 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      color: #000; /* Match Home.html */
+      transition: color 0.3s;
+      text-align: center; /* Match Home.html */
+    }
+    body.dark-mode .sidebar-cell h2 {
+      color: #000000; /* Match Home.html */
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 15px 0; /* Match Home.html */
+      position: relative;
+    }
+    /* Pill Button Styles */
+    .pill-button {
+      background-color: #39d75b; /* Match Home.html */
+      border: 2px solid #000; /* Match Home.html */
+      border-radius: 30px; /* Match Home.html */
+      color: #000; /* Match Home.html */
+      padding: 10px 15px; /* Match Home.html */
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s; /* Match Home.html */
+      font-size: 15px; /* Match Home.html */
+      display: flex;
+      align-items: center;
+      gap: 8px; /* Match Home.html */
+      box-sizing: border-box;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.15); /* Match Home.html */
+    }
+    .sidebar-cell ul li a { /* Applied to anchor within button */
+      color: #000; /* Match Home.html */
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+      font-weight: 500; /* Match Home.html */
+    }
+    /* Accordion Dropdown */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out; /* Match Home.html */
+      margin-left: 20px;
+      padding-left: 0;
+      list-style: none;
+    }
+    /* --- HOVER EFFECT --- */
+    .dropdown:hover .dropdown-menu { /* Use hover from Home.html */
+      max-height: 300px; /* Controls the slide-down */
+    }
+    .dropdown-menu li {
+      margin: 8px 0; /* Match Home.html */
+    }
+    .dropdown-menu .pill-button { /* Style for buttons inside dropdown */
+       font-size: 14px; /* Match Home.html */
+       padding: 8px 15px; /* Match Home.html */
+       /* width is handled by base style */
+    }
+    /* ================================================ */
+    /* === Styles Copied/Adapted from Home.html END === */
+    /* ================================================ */
+
+
+    /* Original Diet.html Specific Styles (Keep or Adjust as needed) */
+    header h1 {
+      color: #1db954;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    /* GALLERY */
+    .gallery-container {
+      max-width: 800px;
+      margin: 30px auto;
+      background-color: var(--gallery-bg);
+      border: 1px solid var(--gallery-border);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    }
+    .toggle-buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .toggle-buttons label {
+      background-color: #e0f7fa;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin: 0 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color var(--transition-speed), transform var(--transition-speed);
+      display: inline-block;
+    }
+    .toggle-buttons label:hover {
+      background-color: #b2ebf2;
+      transform: scale(1.05);
+    }
+    .toggle-buttons input {
+      display: none;
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .gallery-item {
+      width: 200px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafafa;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: inherit;
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    }
+    .gallery-item:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .gallery-item p {
+      margin: 10px 0;
+      padding: 0 5px;
+      color: #1db954;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    /* DARK MODE Adjustments for Diet content */
+    body.dark-mode { /* Merged with above */
+        background-color: var(--dark-mode-bg);
+        color: var(--dark-mode-text);
+    }
+    body.dark-mode .main-cell { /* Merged with above */
+        background-color: var(--dark-mode-main);
+    }
+    body.dark-mode .gallery-container {
+        background-color: var(--dark-mode-gallery);
+        border-color: var(--dark-mode-gallery-border);
+    }
+    body.dark-mode .gallery-item {
+        background: #2e2e2e;
+        border-color: #3a3a3a;
+    }
+    body.dark-mode .gallery-item p {
+        color: #a1e3b1;
+    }
+    /* Ensure header color matches Home.html dark mode */
+    body.dark-mode header h1 {
+         color: #1DB954;
+     }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="dark-mode-toggle" style="display:none;">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙</label> <div id="toast"></div> <table class="layout-table">
+    <tr>
+      <td class="sidebar-cell">
+        <h2>FitSync</h2>
+        <ul>
+          <li><button class="pill-button"><a href="../Home.html">📊 Dashboard</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">📅 Schedule ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="../workout.html">Workout Plan</a></button></li>
+              <li><button class="pill-button"><a href="diet.html">Meal Plan</a></button></li> <li><button class="pill-button"><a href="../schedule.html">Calendar</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="../Community/comm.html">💬 Community</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">⚙️ Settings ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="../Settings/profile.php">Profile</a></button></li>
+              <li><button class="pill-button"><a href="../Settings/privacy.html">Privacy</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="../logout.php">🔒 Logout</a></button></li>
+        </ul>
+      </td>
+      <td class="main-cell">
+        <header>
+          <h1>Meal Options</h1>
+        </header>
+        <div class="gallery-container">
+          <div class="toggle-buttons">
+            <label>
+              <input type="radio" name="meal-type" value="veg" checked> Veg
+            </label>
+            <label>
+              <input type="radio" name="meal-type" value="nonveg"> Non‑Veg
+            </label>
+            <label>
+              <input type="radio" name="meal-type" value="all"> All
+            </label>
+          </div>
+          <div class="gallery">
+            <a href="khichdi.html" class="gallery-item veg">
+              <img src="../images/khichdi.jpeg" alt="Khichdi">
+              <p>Khichdi</p>
+            </a>
+            <a href="oatmeal.html" class="gallery-item veg">
+              <img src="../images/Oatmeal.jpg" alt="Oatmeal">
+              <p>Oatmeal</p>
+            </a>
+            <a href="lentilsoup.html" class="gallery-item veg">
+              <img src="../images/lentilsoup.jpeg"  alt="Lentil Soup">
+              <p>Lentil Soup</p>
+            </a>
+            <a href="tsalad.html" class="gallery-item veg">
+              <img src="../images/tofusalad.jpeg" alt="Tofu Salad">
+              <p>Tofu Salad</p>
+            </a>
+            <a href="quinoa.html" class="gallery-item veg">
+              <img src="../images/quinoa.jpg"  alt="Quinoa Stir Fry">
+              <p>Quinoa Stir Fry</p>
+            </a>
+            <a href="grilledchicken.html" class="gallery-item nonveg" style="display:none;">
+              <img src="../images/grilledchicken.jpg"  alt="Grilled Chicken">
+              <p>Grilled Chicken & Veg</p> </a>
+            <a href="salmon.html" class="gallery-item nonveg" style="display:none;">
+              <img src="../images/salmon.jpeg" alt="Salmon">
+              <p>Salmon & Quinoa</p> </a>
+            <a href="fishcurry.html" class="gallery-item nonveg" style="display:none;">
+              <img src="../images/fishcurry.jpg" alt="Fish Curry">
+              <p>Fish Curry</p>
+            </a>
+            <a href="eggbhurji.html" class="gallery-item nonveg" style="display:none;">
+              <img src="../images/EggBhurji.jpg" alt="Egg Bhurji">
+              <p>Egg Bhurji</p> </a>
+            <a href="prawncurry.html" class="gallery-item nonveg" style="display:none;">
+              <img src="../images/PrawnCurry.jpg" alt="Prawn Curry">
+              <p>Prawn Curry</p> </a>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <footer>
+    <div style="text-align: center; padding: 10px; background-color: #39d75b; color: white;">
+      <p>&copy; 2023 FitSync. All rights reserved.</p>
+    </div>
+  </footer>
+  <script>
+    // Dark Mode Toggle & Cookie Management (Combined from Home.html)
+    (function() {
+      function setCookie(name, value, days) {
+        let expires = ""; if (days) { let date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); expires = "; expires=" + date.toUTCString(); } document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+      }
+      function getCookie(name) {
+        let nameEQ = name + "="; let cookiesArray = document.cookie.split(';'); for (let i = 0; i < cookiesArray.length; i++) { let c = cookiesArray[i].trim(); if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); } } return null;
+      }
+      function applyDarkMode() {
+        let darkModeEnabled = getCookie("darkMode"); let bodyClassList = document.body.classList; let toggle = document.getElementById("dark-mode-toggle"); if (darkModeEnabled === "true") { bodyClassList.add("dark-mode"); if (toggle) toggle.checked = true; } else { bodyClassList.remove("dark-mode"); if (toggle) toggle.checked = false; }
+      }
+      var darkModeToggle = document.getElementById("dark-mode-toggle"); if (darkModeToggle) { darkModeToggle.addEventListener("change", function() { if (this.checked) { document.body.classList.add("dark-mode"); setCookie("darkMode", "true", 30); } else { document.body.classList.remove("dark-mode"); setCookie("darkMode", "false", 30); } }); }
+      applyDarkMode(); // Apply on initial load
+      window.addEventListener("pageshow", function(event) { if (event.persisted) { applyDarkMode(); } }); // Apply on back/forward nav
+    })();
+
+
+   // Updated Meal Type Toggle Function (Keep original logic)
+    function filterMeals(selectedType) {
+      const items = document.querySelectorAll('.gallery-item');
+      items.forEach(item => {
+        if(selectedType === 'all'){
+          item.style.display = 'block'; // Or 'inline-block'/'flex' depending on layout
+        } else {
+          item.style.display = item.classList.contains(selectedType) ? 'block' : 'none';
+        }
+      });
+    }
+
+    // Radio Buttons Event Listeners (Keep original logic)
+    document.querySelectorAll('input[name="meal-type"]').forEach(input => {
+      input.addEventListener('change', function() {
+        filterMeals(this.value);
+      });
+    });
+
+    // Default to Veg on page load (Keep original logic)
+    filterMeals('veg');
+  </script>
+
+</body>
+</html>

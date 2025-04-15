@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitSync Full Day Schedule</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Base Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .layout-table {
+      width: 100%;
+      height: 100vh;
+      border-collapse: collapse;
+    }
+    .sidebar-cell {
+      width: 15%; /* Reduced width */
+      vertical-align: top;
+      background-color: #39d75b;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main-cell {
+      width: 85%; /* Adjusted to match sidebar change */
+      vertical-align: top;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Dark Mode Toggle Button */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+    /* Dark Mode Colors */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ccc;
+    }
+    body.dark-mode .sidebar-cell {
+      background-color: #1AA447;
+      color: #ccc;
+      border-right: 1px solid #333;
+    }
+    body.dark-mode .main-cell {
+      background-color: #191414;
+      color: #ccc;
+    }
+    body.dark-mode .pill-button {
+      background-color: #1DB954;
+      color: #000000;
+      border: 2px solid #004c0a;
+    }
+    body.dark-mode a {
+      color: #fff;
+    }
+    /* Sidebar Styling */
+    .sidebar-cell h2 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      color: #000;
+      transition: color 0.3s;
+    }
+    body.dark-mode .sidebar-cell h2 {
+      color: #000000;
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 20px 0;
+      position: relative;
+    }
+    .pill-button {
+      background-color: #39d75b;
+      border: 2px solid #000;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 20px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-sizing: border-box;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    .sidebar-cell ul li a {
+      color: #000;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+    }
+    /* Accordion Dropdown for Sidebar */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-left: 20px;
+    }
+    .dropdown:hover .dropdown-menu {
+      max-height: 300px;
+    }
+    .dropdown-menu li {
+      margin: 10px 0;
+    }
+    /* Header */
+    header h1 {
+      color: #39d75b;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      transition: color 0.3s;
+    }
+    /* Calendar */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 15px;
+    }
+    .day {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .day header {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .event {
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+    .workout {
+      background-color: #39d75b;
+      color: #fff;
+    }
+    .diet {
+      background-color: #1DB954;
+      color: #fff;
+    }
+    .rest {
+      background-color: #f0ad4e;
+      color: #fff;
+      text-align: center;
+    }
+    body.dark-mode .day {
+      background-color: #1f2a24;
+      color: #ccc;
+      border-color: #1DB954;
+    }
+    /* Motivational Banner */
+    .motivational {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #e8f5e9;
+      border-left: 4px solid #39d75b;
+      font-style: italic;
+      text-align: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode .motivational {
+      background-color: #1f2a24;
+      color: #fff;
+    }
+    /* Meal Toggle Buttons */
+    .meal-toggle label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .meal-toggle input[type="radio"] {
+      display: none;
+    }
+    .meal-toggle label {
+      background-color: #39d75b;
+      border: 2px solid #000;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .meal-toggle label:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    .meal-toggle input[type="radio"]:checked + label {
+      background-color: #1DB954;
+      color: #fff;
+      border-color: #004c0a;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Dark Mode Toggle -->
+  <input type="checkbox" id="dark-mode-toggle">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙 Dark Mode</label>
+
+  <table class="layout-table">
+    <tr>
+      <td class="sidebar-cell">
+        <h2>FitSync</h2>
+        <ul>
+          <li><a class="pill-button" href="Home.html">📊 Dashboard</a></li>
+          <li class="dropdown">
+            <a class="pill-button">📅 Schedule ▼</a>
+            <ul class="dropdown-menu">
+              <li><a class="pill-button" href="sem6mp/workout.html">Workout Plan</a></li>
+              <li><a class="pill-button" href="/sem6mp/Diet/diet.html" target="_blank">Meal Plan</a></li>
+              <li><a class="pill-button" href="schedule.html" target="_blank">Calendar</a></li>
+            </ul>
+          </li>
+          <li><a class="pill-button" href="/sem6mp/Community/comm.html">💬 Community</a></li>
+          <li class="dropdown">
+            <a class="pill-button">⚙️ Settings ▼</a>
+            <ul class="dropdown-menu">
+              <li><a class="pill-button" href="/sem6mp/Settings/profile.php">Profile</a></li>
+              <li><a class="pill-button" href="/sem6mp/Settings/privacy.html">Privacy</a></li>
+            </ul>
+          </li>
+          <li><a class="pill-button" href="../logout.php">🔒 Logout</a></li>
+        </ul>
+      </td>
+      <td class="main-cell">
+        <header>
+          <h1>Full Day Schedule</h1>
+        </header>
+        <div class="meal-toggle">
+          <input type="radio" id="veg" name="meal-type" value="veg">
+          <label for="veg">Veg</label>
+          <input type="radio" id="nonveg" name="meal-type" value="nonveg">
+          <label for="nonveg">Non‑Veg</label>
+          <input type="radio" id="mixed" name="meal-type" value="mixed" checked>
+          <label for="mixed">Mixed</label>
+        </div>
+        <div class="calendar">
+          <!-- Monday (Day 0) -->
+          <div class="day">
+            <header>Monday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="0" data-event-index="0" data-default-meal-type="veg" data-default-recipe="Oatmeal" data-time="8:00 AM">
+              <strong>Meal:</strong> Oatmeal<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Weight Loss Routine<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="0" data-event-index="1" data-default-meal-type="veg" data-default-recipe="Khichdi" data-time="12:30 PM">
+              <strong>Meal:</strong> Khichdi<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Muscle Gain Routine<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="0" data-event-index="2" data-default-meal-type="veg" data-default-recipe="Tofu Salad" data-time="8:00 PM">
+              <strong>Meal:</strong> Tofu Salad<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Tuesday (Day 1) -->
+          <div class="day">
+            <header>Tuesday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="1" data-event-index="3" data-default-meal-type="nonveg" data-default-recipe="Egg Bhurji" data-time="8:00 AM">
+              <strong>Meal:</strong> Egg Bhurji<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Muscle Gain Routine<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="1" data-event-index="4" data-default-meal-type="nonveg" data-default-recipe="Grilled Chicken with Steamed Broccoli & Sweet Potato" data-time="12:30 PM">
+              <strong>Meal:</strong> Grilled Chicken with Steamed Broccoli & Sweet Potato<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Endurance Training<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="1" data-event-index="5" data-default-meal-type="nonveg" data-default-recipe="Fish Curry" data-time="8:00 PM">
+              <strong>Meal:</strong> Fish Curry<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Wednesday (Day 2) -->
+          <div class="day">
+            <header>Wednesday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="2" data-event-index="6" data-default-meal-type="veg" data-default-recipe="Oatmeal" data-time="8:00 AM">
+              <strong>Meal:</strong> Oatmeal<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Weight Loss Routine<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="2" data-event-index="7" data-default-meal-type="veg" data-default-recipe="Quinoa Stir Fry" data-time="12:30 PM">
+              <strong>Meal:</strong> Quinoa Stir Fry<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Muscle Gain Routine<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="2" data-event-index="8" data-default-meal-type="nonveg" data-default-recipe="Salmon with Quinoa and Asparagus" data-time="8:00 PM">
+              <strong>Meal:</strong> Salmon with Quinoa and Asparagus<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Thursday (Day 3) -->
+          <div class="day">
+            <header>Thursday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="3" data-event-index="9" data-default-meal-type="nonveg" data-default-recipe="Egg Bhurji" data-time="8:00 AM">
+              <strong>Meal:</strong> Egg Bhurji<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Endurance Training<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="3" data-event-index="10" data-default-meal-type="veg" data-default-recipe="Lentil Soup" data-time="12:30 PM">
+              <strong>Meal:</strong> Lentil Soup<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Weight Loss Routine<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="3" data-event-index="11" data-default-meal-type="nonveg" data-default-recipe="Prawn Curry" data-time="8:00 PM">
+              <strong>Meal:</strong> Prawn Curry<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Friday (Day 4) -->
+          <div class="day">
+            <header>Friday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="4" data-event-index="12" data-default-meal-type="veg" data-default-recipe="Tofu Salad" data-time="8:00 AM">
+              <strong>Meal:</strong> Tofu Salad<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Muscle Gain Routine<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="4" data-event-index="13" data-default-meal-type="veg" data-default-recipe="Khichdi" data-time="12:30 PM">
+              <strong>Meal:</strong> Khichdi<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Endurance Training<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="4" data-event-index="14" data-default-meal-type="nonveg" data-default-recipe="Fish Curry" data-time="8:00 PM">
+              <strong>Meal:</strong> Fish Curry<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Saturday (Day 5) -->
+          <div class="day">
+            <header>Saturday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="5" data-event-index="15" data-default-meal-type="veg" data-default-recipe="Oatmeal" data-time="8:00 AM">
+              <strong>Meal:</strong> Oatmeal<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Weight Loss Routine<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="5" data-event-index="16" data-default-meal-type="nonveg" data-default-recipe="Grilled Chicken with Steamed Broccoli & Sweet Potato" data-time="12:30 PM">
+              <strong>Meal:</strong> Grilled Chicken with Steamed Broccoli & Sweet Potato<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Muscle Gain Routine<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="5" data-event-index="17" data-default-meal-type="veg" data-default-recipe="Lentil Soup" data-time="8:00 PM">
+              <strong>Meal:</strong> Lentil Soup<br><em>8:00 PM</em>
+            </div>
+          </div>
+          
+          <!-- Sunday (Day 6) -->
+          <div class="day">
+            <header>Sunday</header>
+            <!-- Breakfast (Meal) -->
+            <div class="event diet" data-day-index="6" data-event-index="18" data-default-meal-type="nonveg" data-default-recipe="Egg Bhurji" data-time="8:00 AM">
+              <strong>Meal:</strong> Egg Bhurji<br><em>8:00 AM</em>
+            </div>
+            <!-- Morning Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Endurance Training<br><em>9:00 AM</em>
+            </div>
+            <!-- Lunch (Meal) -->
+            <div class="event diet" data-day-index="6" data-event-index="19" data-default-meal-type="veg" data-default-recipe="Tofu Salad" data-time="12:30 PM">
+              <strong>Meal:</strong> Tofu Salad<br><em>12:30 PM</em>
+            </div>
+            <!-- Evening Workout -->
+            <div class="event workout">
+              <strong>Workout:</strong> Weight Loss Routine<br><em>6:00 PM</em>
+            </div>
+            <!-- Dinner (Meal) -->
+            <div class="event diet" data-day-index="6" data-event-index="20" data-default-meal-type="nonveg" data-default-recipe="Salmon with Quinoa and Asparagus" data-time="8:00 PM">
+              <strong>Meal:</strong> Salmon with Quinoa and Asparagus<br><em>8:00 PM</em>
+            </div>
+          </div>
+        </div>
+        <div class="motivational">
+          “Keep pushing towards your fitness goals – every workout and healthy meal counts!”
+        </div>
+      </td>
+    </tr>
+  </table>
+  <footer>
+    <div style="text-align: center; padding: 10px; background-color: #39d75b; color: white;">
+      <p>&copy; 2023 FitSync. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    // Recipe arrays for meal switching
+    const vegRecipes = [
+      "Khichdi",
+      "Oatmeal",
+      "Lentil Soup",
+      "Tofu Salad",
+      "Quinoa Stir Fry"
+    ];
+    
+    const nonVegRecipes = [
+      "Grilled Chicken with Steamed Broccoli & Sweet Potato",
+      "Salmon with Quinoa and Asparagus",
+      "Fish Curry",
+      "Egg Bhurji",
+      "Prawn Curry"
+    ];
+    
+    // Update diet events based on selected meal type
+    const mealInputs = document.querySelectorAll('input[name="meal-type"]');
+    const dietEvents = document.querySelectorAll('.event.diet');
+    
+    function updateDietEvents(selectedType) {
+      dietEvents.forEach(event => {
+        const eventIndex = parseInt(event.getAttribute('data-event-index'));
+        const defaultType = event.getAttribute('data-default-meal-type');
+        const defaultRecipe = event.getAttribute('data-default-recipe');
+        const time = event.getAttribute('data-time');
+        
+        // Mixed: restore original recipe
+        if(selectedType === 'mixed') {
+          event.innerHTML = `<strong>Meal:</strong> ${defaultRecipe}<br><em>${time}</em>`;
+        }
+        // Veg selection: if the event was originally nonveg, replace with a veg recipe.
+        else if(selectedType === 'veg') {
+          if(defaultType === 'nonveg') {
+            const newRecipe = vegRecipes[eventIndex % vegRecipes.length];
+            event.innerHTML = `<strong>Meal:</strong> ${newRecipe}<br><em>${time}</em>`;
+          } else {
+            event.innerHTML = `<strong>Meal:</strong> ${defaultRecipe}<br><em>${time}</em>`;
+          }
+        }
+        // Nonveg selection: if the event was originally veg, replace with a nonveg recipe.
+        else if(selectedType === 'nonveg') {
+          if(defaultType === 'veg') {
+            const newRecipe = nonVegRecipes[eventIndex % nonVegRecipes.length];
+            event.innerHTML = `<strong>Meal:</strong> ${newRecipe}<br><em>${time}</em>`;
+          } else {
+            event.innerHTML = `<strong>Meal:</strong> ${defaultRecipe}<br><em>${time}</em>`;
+          }
+        }
+      });
+    }
+    
+    mealInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        updateDietEvents(this.value);
+      });
+    });
+    
+    // Initialize with Mixed view
+    updateDietEvents('mixed');
+  </script>
+  
+  <script>
+    // Combined dark mode and cookie management
+    (function() {
+      // Hide dark mode toggle input via CSS is already applied (#dark-mode-toggle { display: none; })
+      
+      function setCookie(name, value, days) {
+          let expires = "";
+          if (days) {
+              let date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              expires = "; expires=" + date.toUTCString();
+          }
+          document.cookie = name + "=" + value + expires + "; path=/";
+      }
+      
+      function getCookie(name) {
+          let nameEQ = name + "=";
+          let cookiesArray = document.cookie.split(';');
+          for (let i = 0; i < cookiesArray.length; i++) {
+              let c = cookiesArray[i].trim();
+              if (c.indexOf(nameEQ) === 0) {
+                  return c.substring(nameEQ.length, c.length);
+              }
+          }
+          return null;
+      }
+      
+      const darkModeToggle = document.getElementById("dark-mode-toggle");
+      
+      // Apply dark mode from cookie on load
+      window.addEventListener("load", function() {
+          if(getCookie("darkMode") === "true") {
+              document.body.classList.add("dark-mode");
+              darkModeToggle.checked = true;
+          }
+      });
+      
+      // Toggle dark mode and update cookie
+      darkModeToggle.addEventListener("change", function() {
+          if (this.checked) {
+              document.body.classList.add("dark-mode");
+              setCookie("darkMode", "true", 30);
+          } else {
+              document.body.classList.remove("dark-mode");
+              setCookie("darkMode", "false", 30);
+          }
+      });
+    })();
+  </script>
+</body>
+</html>

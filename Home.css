@@ -1,0 +1,174 @@
+#fs{
+  color: black;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 200px;
+  background: hsl(145, 63%, 45%);
+  padding: 20px;
+  height: 100vh;
+  color: white;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+.sidebar ul li {
+  margin: 15px 0;
+}
+
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+.stats {
+  display: flex;
+  gap: 20px;
+}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode */
+#dark-mode-toggle {
+  display: none;
+}
+.dark-mode-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #333;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#dark-mode-toggle:checked ~ .sidebar {
+  background: hsl(145, 63%, 40%);
+}
+#dark-mode-toggle:checked ~ .main-content {
+  background-color: #121212;
+  color: white;
+}
+#dark-mode-toggle:checked ~ .main-content .card {
+  background: #1e1e1e;
+  color: white;
+  box-shadow: none;
+}
+
+/* Pill Button Styles */
+.pill-button {
+  background-color: transparent;
+  border: 2px solid hsl(145, 63%, 25%);
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.pill-button:hover {
+  background-color: hsl(0, 0%, 76%);
+}
+
+/* Dropdown Menu Styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: hsl(145, 63%, 45%);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 3px solid hsl(145, 63%, 25%);
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  z-index: 10;
+}
+.sidebar .dropdown:nth-child(3) .dropdown-menu {
+  top: 0;
+}
+.dropdown:hover > .dropdown-menu,
+.dropdown:focus-within > .dropdown-menu {
+  display: block;
+}
+.dropdown-menu li {
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-menu li:last-child {
+  border-bottom: none;
+}
+.dropdown-menu li a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+
+/* --------------------------
+   BMI Calculator Styles
+----------------------------- */
+.bmi-container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: white;
+}
+.dark-mode .bmi-container {
+  background: #1e1e1e;
+  border-color: #444;
+}
+.bmi-container h2 {
+  margin-bottom: 15px;
+}
+.bmi-container .result {
+  margin-top: 20px;
+  font-weight: bold;
+}
+.bmi-container .bar-container {
+  width: 100%;
+  height: 30px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, blue 18.5%, green 24.9%, yellow 29.9%, red 100%);
+  position: relative;
+}
+.bmi-container .bar {
+  height: 100%;
+  border-radius: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.bmi-container .bar-label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  color: white;
+}

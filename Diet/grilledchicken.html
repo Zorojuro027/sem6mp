@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grilled Chicken Recipe - FitSync Diet</title>
+  <style>
+    /* Base Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .layout-table {
+      width: 100%;
+      height: 100vh;
+      border-collapse: collapse;
+    }
+    .sidebar-cell {
+      width: 20%;
+      vertical-align: top;
+      background-color: #1fd146;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main-cell {
+      width: 80%;
+      vertical-align: top;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Dark Mode Toggle Button (floating at top-right) */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+
+    /* Dark Mode Colors (Spotify-inspired) */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ccc;
+    }
+    /* Sidebar in dark mode: Darker Spotify green */
+    body.dark-mode .sidebar-cell {
+      background-color: hsla(140, 96%, 35%, 0.806);
+      color: #ccc;
+      border-right: 1px solid #333;
+    }
+    body.dark-mode .main-cell {
+      background-color: #191414;
+      color: #ccc;
+    }
+    /* Pill buttons in dark mode use Spotify green with white text */
+    body.dark-mode .pill-button {
+      background-color: #1DB954;
+      color: #000000;
+      border-color: #025b00;
+    }
+    body.dark-mode a {
+      color: #fff;
+    }
+
+    /* Sidebar Styling */
+    .sidebar-cell h2 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      color: #000;
+      transition: color 0.3s;
+    }
+    body.dark-mode .sidebar-cell h2 {
+      color: #ccc;
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 20px 0;
+      position: relative;
+    }
+    .pill-button {
+      background-color: #39d75b;
+      border: 2px solid #025b00;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 20px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: rgb(0, 0, 0);
+    }
+    .sidebar-cell ul li a {
+      color: #000;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+    }
+
+    /* Accordion Dropdown for Sidebar */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-left: 20px;
+    }
+    .dropdown:hover .dropdown-menu {
+      max-height: 300px;
+    }
+    .dropdown-menu li {
+      margin: 10px 0;
+    }
+
+    /* Header & Recipe Content */
+    header h1 {
+      color: #39d75b;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      transition: color 0.3s;
+    }
+    .recipe {
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .recipe h2 {
+      color: #39d75b;
+      margin-bottom: 10px;
+    }
+    .recipe ul, .recipe ol {
+      margin-left: 20px;
+    }
+    .recipe p {
+      line-height: 1.6;
+    }
+
+    /* Dark Mode for Recipe */
+    body.dark-mode .recipe {
+      background-color: #2e2e2e;
+      color: #ccc;
+      border-color: #444;
+    }
+    body.dark-mode .recipe h2 {
+      color: #1DB954;
+    }
+
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s;
+    }
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Dark Mode Toggle -->
+  <input type="checkbox" id="dark-mode-toggle">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙 Dark Mode</label>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <table class="layout-table">
+    <tr>
+      <td class="sidebar-cell">
+        <h2>FitSync</h2>
+        <ul>
+          <li><button class="pill-button"><a href="../Home.html">📊 Dashboard</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">📅 Schedule ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="../workout.html">Workout Plan</a></button></li>
+              <li><button class="pill-button"><a href="../Diet/diet.html" target="_blank">Meal Plan</a></button></li>
+              <li><button class="pill-button"><a href="../schedule.html" target="_blank">Calendar</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="../Community/comm.html">💬 Community</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">⚙️ Settings ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="../Settings/profile.php">Profile</a></button></li>
+              <li><button class="pill-button"><a href="../Settings/privacy.html">Privacy</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="../logout.php">🔒 Logout</a></button></li>
+        </ul>
+      </td>
+      <td class="main-cell">
+        <header>
+          <h1>Grilled Chicken Recipe</h1>
+        </header>
+        <article class="recipe">
+          <h2>Ingredients:</h2>
+          <ul>
+            <li>2 boneless, skin‑less chicken breasts</li>
+            <li>1 tablespoon olive oil</li>
+            <li>Salt, pepper, and paprika to taste</li>
+            <li>1 medium sweet potato, cubed</li>
+            <li>2 cups broccoli florets</li>
+            <li>Lemon wedges for serving</li>
+          </ul>
+          <h2>Instructions:</h2>
+          <ol>
+            <li>Preheat your grill to medium‑high heat.</li>
+            <li>Rub chicken with olive oil, salt, pepper, and paprika.</li>
+            <li>Grill the chicken for 6–7 minutes per side until fully cooked.</li>
+            <li>Steam the sweet potato cubes and broccoli until tender.</li>
+            <li>Slice the chicken and serve alongside the vegetables with a squeeze of lemon.</li>
+          </ol>
+          <p>
+            A lean and balanced meal, this grilled chicken dish provides high‑quality protein with complex carbohydrates and fiber for muscle building and sustained energy.
+          </p>
+        </article>
+      </td>
+    </tr>
+  </table>
+
+  <script>
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    darkModeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Toast Notification Function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+
+  <!-- Cookie Storage for Dark Mode and Meal Preference -->
+<script>
+  (function() {
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+    
+    // Function to get a cookie value
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let cookiesArray = document.cookie.split(';');
+        for (let i = 0; i < cookiesArray.length; i++) {
+            let c = cookiesArray[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    }
+    
+    // Function to apply dark mode based on cookie
+    function applyDarkMode() {
+        let darkModeEnabled = getCookie("darkMode");
+        if (darkModeEnabled === "true") {
+            document.body.classList.add("dark-mode");
+            var toggle = document.getElementById("dark-mode-toggle");
+            if (toggle) toggle.checked = true;
+        }
+    }
+    
+    // Function to apply meal preference (if element exists)
+    function applyMealPreference() {
+        let mealPref = getCookie("mealPref");
+        let mealPreferenceSelect = document.getElementById("mealPreference");
+        if (mealPref && mealPreferenceSelect) {
+            mealPreferenceSelect.value = mealPref;
+        }
+    }
+    
+    // Set up dark mode toggle event
+    var darkModeToggle = document.getElementById("dark-mode-toggle");
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("change", function() {
+            if (this.checked) {
+                document.body.classList.add("dark-mode");
+                setCookie("darkMode", "true", 30);
+            } else {
+                document.body.classList.remove("dark-mode");
+                setCookie("darkMode", "false", 30);
+            }
+        });
+    }
+    
+    // Set up meal preference change event (if element exists)
+    var mealPreferenceSelect = document.getElementById("mealPreference");
+    if (mealPreferenceSelect) {
+        mealPreferenceSelect.addEventListener("change", function() {
+            setCookie("mealPref", this.value, 30);
+        });
+    }
+    
+    // Apply preferences on page load
+    window.addEventListener("load", function() {
+        applyDarkMode();
+        applyMealPreference();
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Workout - FitSync</title>
+  <style>
+    /* Base Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .layout-table {
+      width: 100%;
+      height: 100vh;
+      border-collapse: collapse;
+    }
+    .sidebar-cell {
+      width: 20%;
+      vertical-align: top;
+      background-color: #39d75b;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main-cell {
+      width: 80%;
+      vertical-align: top;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Dark Mode Toggle Button (floating at top-right) */
+    input#dark-mode-toggle {
+      display: none;
+    }
+    .dark-mode-btn {
+      cursor: pointer;
+      position: fixed;
+      top: 2px;
+      right:2px;
+      background-color: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 5px;
+      z-index: 1000;
+      transition: background-color 0.3s;
+    }
+    .dark-mode-btn:hover {
+      background-color: #444;
+    }
+
+    /* Dark Mode Colors (Spotify-inspired) */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ccc;
+    }
+    /* Sidebar in dark mode: Darker Spotify green */
+    body.dark-mode .sidebar-cell {
+      background-color: #1AA447;
+      color: #ccc;
+      border-right: 1px solid #333;
+    }
+    body.dark-mode .main-cell {
+      background-color: #191414;
+      color: #ccc;
+    }
+    /* Pill buttons in dark mode use Spotify green with white text */
+    body.dark-mode .pill-button {
+      background-color: #1DB954; /* updated to match Home.html */
+      color: #030000;          /* updated to match Home.html */
+      border: 2px solid #004c0a;/* updated to match Home.html */
+    }
+    body.dark-mode a {
+      color: #fff;
+    }
+
+    /* Sidebar Styling */
+    .sidebar-cell h2 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      color: #000;
+      transition: color 0.3s;
+    }
+    body.dark-mode .sidebar-cell h2 {
+      color: #000000;
+    }
+    .sidebar-cell ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-cell ul li {
+      margin: 20px 0;
+      position: relative;
+    }
+    .pill-button {
+      background-color: #39d75b;
+      border: 2px solid #000;
+      border-radius: 30px;
+      color: #000;
+      padding: 10px 20px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    .sidebar-cell ul li a {
+      color: #000;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      transition: color 0.3s;
+    }
+
+    /* Accordion Dropdown for Sidebar */
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-left: 20px;
+    }
+    .dropdown:hover .dropdown-menu {
+      max-height: 300px;
+    }
+    .dropdown-menu li {
+      margin: 10px 0;
+    }
+
+    
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s;
+    }
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Main Content Enhancements */
+    .main-cell {
+      background-color: #fafafa;
+      padding: 40px;
+    }
+    .main-cell .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    body.dark-mode .main-cell .container {
+      background-color: #1c1c1c;
+      border: 2px solid #1e5b00;
+    }
+    .dark-mode-btn .main-cell .container h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2.8em;
+      color: #ffffff;
+    }
+    .main-cell.container{
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2.8em;
+      color: #000000;
+    }
+    #workoutForm {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #workoutForm label {
+      font-weight: 600;
+      font-size: 1.1em;
+      color: #555;
+    }
+    #workoutForm select,
+    #workoutForm button {
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    #workoutForm button {
+      background-color: #1db954;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #workoutForm button:hover {
+      background-color: #17a44b;
+    }
+    #workoutPlan {
+      margin-top: 30px;
+    }
+    #workoutPlan h2 {
+      margin-bottom: 15px;
+      color: #ffffff;
+    }
+    #workoutPlan img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Dark Mode Toggle -->
+  <input type="checkbox" id="dark-mode-toggle">
+  <label for="dark-mode-toggle" class="dark-mode-btn">🌙 Dark Mode</label>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <table class="layout-table">
+    <!-- Sidebar -->
+    <tr>
+      <td class="sidebar-cell">
+        <h2>FitSync</h2>
+        <ul>
+          <li><button class="pill-button"><a href="Home.html">📊 Dashboard</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">📅 Schedule ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="/workout.html">Workout Plan</a></button></li>
+              <li><button class="pill-button"><a href="Diet/diet.html" target="_blank">Meal Plan</a></button></li>
+              <li><button class="pill-button"><a href="/schedule.html" target="_blank">Calendar</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="Community/comm.html">💬 Community</a></button></li>
+          <li class="dropdown">
+            <button class="pill-button">⚙️ Settings ▼</button>
+            <ul class="dropdown-menu">
+              <li><button class="pill-button"><a href="Settings/profile.php">Profile</a></button></li>
+              <li><button class="pill-button"><a href="Settings/privacy.html">Privacy</a></button></li>
+            </ul>
+          </li>
+          <li><button class="pill-button"><a href="../logout.php">🔒 Logout</a></button></li>
+        </ul>
+      </td>
+   
+      <!-- Main Content -->
+      <td class="main-cell">
+        <div class="container">
+          <h1>Personalized Workout Plan</h1>
+          <form id="workoutForm">
+            <label for="goal">Workout Goal:</label>
+            <select id="goal" name="goal" required>
+              <option value="weight_loss">Weight Loss</option>
+              <option value="muscle_gain">Muscle Gain</option>
+              <option value="endurance">Endurance</option>
+            </select>
+            <button type="submit">Get Workout Plan</button>
+          </form>
+          <div id="workoutPlan"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <footer>
+    <div style="text-align: center; padding: 10px; background-color: #39d75b; color: white;">
+      <p>&copy; 2023 FitSync. All rights reserved.</p>
+    </div>
+  </footer>
+      
+  <script>
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    darkModeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+    
+    // Handle workout form submission with fade-in effect
+    document.getElementById('workoutForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const goal = document.getElementById('goal').value;
+      let planContent = '';
+      const name = "User"; // Replace with actual user's name if available
+      
+      if (goal === 'weight_loss') {
+        planContent = `
+          <div>
+            <h2>Workout Plan for ${name}</h2>
+            <p><strong>Goal:</strong> Weight Loss</p>
+            <h3>Steps</h3>
+            <ol>
+              <li><strong>Warm-Up:</strong> 10 minutes jogging in place and dynamic stretches.</li>
+              <li><strong>Cardio:</strong> 30 minutes of running or cycling.</li>
+              <li><strong>Strength Training:</strong> 3 sets of 15 reps of bodyweight exercises (push-ups, squats, lunges).</li>
+              <li><strong>Cool Down:</strong> 10 minutes of stretching or yoga.</li>
+            </ol>
+            <img src="../images/weight_loss.jpg" alt="Weight Loss Workout">
+          </div>
+        `;
+      } else if (goal === 'muscle_gain') {
+        planContent = `
+          <div>
+            <h2>Workout Plan for ${name}</h2>
+            <p><strong>Goal:</strong> Muscle Gain</p>
+            <h3>Steps</h3>
+            <ol>
+              <li><strong>Warm-Up:</strong> 10 minutes of dynamic stretching.</li>
+              <li><strong>Strength Training:</strong> 4 sets of 8-12 reps of weightlifting exercises (bench press, deadlift, squats).</li>
+              <li><strong>HIIT:</strong> 15 minutes of high-intensity interval training.</li>
+              <li><strong>Cool Down:</strong> 10 minutes of stretching.</li>
+            </ol>
+            <img src="../images/muscle_gain.jpg" alt="Muscle Gain Workout">
+          </div>
+        `;
+      } else if (goal === 'endurance') {
+        planContent = `
+          <div>
+            <h2>Workout Plan for ${name}</h2>
+            <p><strong>Goal:</strong> Endurance</p>
+            <h3>Steps</h3>
+            <ol>
+              <li><strong>Warm-Up:</strong> 10 minutes light cardio and mobility drills.</li>
+              <li><strong>Cardio:</strong> 45 minutes of steady-state cardio (running, cycling, or swimming).</li>
+              <li><strong>Strength:</strong> 3 sets of 20 reps of bodyweight exercises (push-ups, squats, lunges).</li>
+              <li><strong>Cool Down:</strong> 15 minutes of yoga or full-body stretching.</li>
+            </ol>
+            <img src="../images/endurance.jpg" alt="Endurance Workout">
+          </div>
+        `;
+      }
+      document.getElementById('workoutPlan').innerHTML = planContent;
+    });
+    
+    // Toast Notification Function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+
+<script>
+  (function() {
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+    
+    // Function to get a cookie value
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let cookiesArray = document.cookie.split(';');
+        for (let i = 0; i < cookiesArray.length; i++) {
+            let c = cookiesArray[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    }
+    
+    // Function to apply dark mode based on cookie
+    function applyDarkMode() {
+        let darkModeEnabled = getCookie("darkMode");
+        if (darkModeEnabled === "true") {
+            document.body.classList.add("dark-mode");
+            var toggle = document.getElementById("dark-mode-toggle");
+            if (toggle) toggle.checked = true;
+        }
+    }
+    
+    // Function to apply meal preference (if element exists)
+    function applyMealPreference() {
+        let mealPref = getCookie("mealPref");
+        let mealPreferenceSelect = document.getElementById("mealPreference");
+        if (mealPref && mealPreferenceSelect) {
+            mealPreferenceSelect.value = mealPref;
+        }
+    }
+    
+    // Set up dark mode toggle event
+    var darkModeToggle = document.getElementById("dark-mode-toggle");
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("change", function() {
+            if (this.checked) {
+                document.body.classList.add("dark-mode");
+                setCookie("darkMode", "true", 30);
+            } else {
+                document.body.classList.remove("dark-mode");
+                setCookie("darkMode", "false", 30);
+            }
+        });
+    }
+    
+    // Set up meal preference change event (if element exists)
+    var mealPreferenceSelect = document.getElementById("mealPreference");
+    if (mealPreferenceSelect) {
+        mealPreferenceSelect.addEventListener("change", function() {
+            setCookie("mealPref", this.value, 30);
+        });
+    }
+    
+    // Apply preferences on page load
+    window.addEventListener("load", function() {
+        applyDarkMode();
+        applyMealPreference();
+    });
+  })();
+</script>
+</body>
+</html>
